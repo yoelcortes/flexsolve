@@ -1,0 +1,12 @@
+README.rst
+setup.py
+flexsolve/__init__.py
+flexsolve/bounded_solvers.py
+flexsolve/exceptions.py
+flexsolve/iterative_solvers.py
+flexsolve/open_solvers.py
+flexsolve.egg-info/PKG-INFO
+flexsolve.egg-info/SOURCES.txt
+flexsolve.egg-info/dependency_links.txt
+flexsolve.egg-info/requires.txt
+flexsolve.egg-info/top_level.txt
