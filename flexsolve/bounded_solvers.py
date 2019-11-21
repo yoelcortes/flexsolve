@@ -4,8 +4,6 @@ Created on Tue Jul  9 00:35:01 2019
 
 @author: yoelr
 """
-from .exceptions import SolverError
-import numpy as np
 
 __all__ = ('false_position', 'bounded_wegstein',
            'bounded_aitken', 'IQ_interpolation')
@@ -18,6 +16,8 @@ def false_position(f, x0, x1, y0, y1, x, yval, xtol, ytol):
     df = yval-y0
     if not (x0 < x < x1 or x1 < x < x0):
         x = x0 + df*dx/(y1-y0)
+        if not (x0 < x < x1 or x1 < x < x0):
+            x = (x1 + x0)/2.
     yval_ub = yval + ytol
     yval_lb = yval - ytol
     while _abs(dx) > xtol:
@@ -35,7 +35,7 @@ def false_position(f, x0, x1, y0, y1, x, yval, xtol, ytol):
         dy = y1-y0
         if dy:
             x = x0 + df*dx/dy
-        if _abs(x - x_old) < dx/10:
+        if _abs(x - x_old) < dx/10 or not (x0 < x < x1 or x1 < x < x0):
             x = (x1 + x0)/2.
     return x
 
