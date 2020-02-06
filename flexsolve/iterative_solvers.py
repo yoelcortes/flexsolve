@@ -7,8 +7,18 @@ Created on Tue Nov 19 22:57:42 2019
 from .exceptions import SolverError
 import numpy as np
 
-__all__ = ('wegstein', 'conditional_wegstein', 
+__all__ = ('fixed_point',
+           'wegstein', 'conditional_wegstein', 
            'aitken', 'conditional_aitken')
+
+def fixed_point(f, x0, xtol, args=(), maxiter=50):
+    """Iterative fixed-point solver."""
+    np_abs = np.abs
+    for iter in range(maxiter):
+        x1 = f(x0, *args)
+        if (np_abs(x1-x0) < xtol).all(): return x1
+        x0 = x1
+    raise SolverError(f'failed to converge after {maxiter} iterations')
 
 def wegstein(f, x0, xtol, args=(), maxiter=50):
     """Iterative Wegstein solver."""
@@ -53,7 +63,6 @@ def aitken(f, x, xtol, args=(), maxiter=50):
     """Iterative Aitken solver."""
     gg = x
     x = x.copy()
-    abs_ = abs
     np_abs = np.abs
     for iter in range(maxiter):
         try: g = f(x, *args)
@@ -61,10 +70,10 @@ def aitken(f, x, xtol, args=(), maxiter=50):
             x = gg.copy()
             g = f(x, *args)
         dxg = x - g
-        if (abs_(dxg) < xtol).all(): return g
+        if (np_abs(dxg) < xtol).all(): return g
         gg = f(g, *args)
         dgg_g = gg - g
-        if (abs_(dgg_g) < xtol).all(): return gg
+        if (np_abs(dgg_g) < xtol).all(): return gg
         dummy = dgg_g + dxg
         mask = np_abs(dummy) > 1e-16
         x[mask] -= dxg[mask]**2/dummy[mask]
