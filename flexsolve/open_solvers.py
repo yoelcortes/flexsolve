@@ -5,11 +5,13 @@ Created on Tue Nov 19 22:50:26 2019
 @author: yoelr
 """
 from .exceptions import SolverError
+import numpy as np
 
 __all__ = ('secant', 'wegstein_secant', 'aitken_secant')
 
 def secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     """Secant solver."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     y0 = f(x0, *args)
     if _abs(y0) < ytol: return x0
@@ -25,6 +27,7 @@ def secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     
 def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Wegstein acceleration."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     y0 = f(x0, *args)
     if _abs(y0) < ytol: return x0
@@ -51,6 +54,7 @@ def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     
 def aitken_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Aitken acceleration."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     y0 = f(x0, *args)
     if _abs(y0) < ytol: return x0

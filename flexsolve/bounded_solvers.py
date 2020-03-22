@@ -4,6 +4,7 @@ Created on Tue Jul  9 00:35:01 2019
 
 @author: yoelr
 """
+import numpy as np
 
 __all__ = ('false_position', 'bisection', 'bounded_wegstein',
            'bounded_aitken', 'IQ_interpolation')
@@ -20,6 +21,7 @@ def get_default_bounds_bounds(f, x0, x1, y0, y1, args):
 
 def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """False position solver."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
     dx = x1 - x0
@@ -44,6 +46,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol
 
 def bisection(f, x0, x1, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """Bisection solver."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     yval_ub = yval + ytol
     yval_lb = yval - ytol
@@ -88,9 +91,9 @@ def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
     d02 = df0-df2
     d12 = df1-df2
     if all([d12, d02, d01]):
-        df0_d12 = df0/d12
-        df1_d02 = df1/d02
-        df2_d01 = df2/d01
+        df0_d12 = df0 / d12
+        df1_d02 = df1 / d02
+        df2_d01 = df2 / d01
         x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02
         if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
             x = bisect(x0, x1)
@@ -100,6 +103,7 @@ def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
 
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """Inverse quadratic interpolation solver."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
     df0 = yval - y0
@@ -129,6 +133,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
 
 def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """False position solver with Wegstein acceleration."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
     dx = x1 - x0
@@ -163,19 +168,20 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
         dx1x0 = x1-x0
         g1 = x0 + df*dx1x0/(y1-y0)
         dx = x - x_old
-        try:
-            w = dx/(dx-g1+g0)
+        denominator = dx-g1+g0
+        if denominator:
+            w = dx / denominator
             x_old = x
             x = w*g1 + (1.-w)*x
-        except:
-            x = g0 = g1
+            if not_within_bounds(x, x0, x1): x = g0 = g1
+            else: g0 = g1                
         else:
-            if not_within_bounds(x, x0, x1): g0 = g1                
-            else: x = g0 = g1
+            x = g0 = g1
     return x
        
 def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """False position solver with Aitken acceleration."""
+    np.seterr(divide='raise', invalid='raise')
     _abs = abs
     x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
     dx1 = x1-x0
@@ -212,11 +218,10 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol
         dx1 = x1-x0
         gg = x0 + df*dx1/(y1-y0)
         dxg = x - g
-        try: x = x - dxg**2./(gg + dxg - g)
-        except:
+        denominator = gg + dxg - g
+        if denominator:
+            x = x - dxg**2. / denominator
+        if not_within_bounds(x, x0, x1):
             # Add overshoot to prevent getting stuck
             x = gg + 0.1*(x1+x0-2*gg)*(dx1/dx0)**3. 
-        else:
-            if not_within_bounds(x, x0, x1):
-                x = gg + 0.1*(x1+x0-2*gg)*(dx1/dx0)**3. 
     return x
