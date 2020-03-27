@@ -5,25 +5,89 @@ Created on Tue Jul  9 00:35:01 2019
 @author: yoelr
 """
 import numpy as np
+from .exceptions import SolverError
+from collections import namedtuple
 
 __all__ = ('false_position', 'bisection', 'bounded_wegstein',
-           'bounded_aitken', 'IQ_interpolation')
+           'bounded_aitken', 'IQ_interpolation', 'find_bracket')
 
-def get_default_bounds_bounds(f, x0, x1, y0, y1, args):
+# %% Tools
+
+Bracket = namedtuple('Braket', ('x0', 'x1', 'y0', 'y1'), module=__name__)        
+
+def get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args):
     if y0 is None:
         y0 = f(x0, *args)
     if y1 is None:
         y1 = f(x1, *args)
-    if y1 < 0.:
+    if y1 < yval:
         return x1, y1, x0, y0
     else:
         return x0, y0, x1, y1
+
+def not_within_bounds(x, x0, x1):
+    return not (x0 < x < x1 or x1 < x < x0)
+
+def iteration_is_getting_stuck(x, xlast, dx):
+    return abs((x - xlast) / dx) < 0.10
+
+def bisect(x0, x1):
+    return (x0 + x1) / 2.0
+
+def iter_false_position(x0, x1, dx, y0, y1, yval, df, xlast):
+    dy = y1 - y0
+    if dy:
+        x = x0 + df*dx/dy
+        if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
+            x = bisect(x0, x1)
+    else:
+        x = bisect(x0, x1)
+    return x
+
+def find_bracket(f, x0, x1, y0=None, y1=None, yval=0, args=(), maxiter=50):
+    """
+    Return a bracket within `x0` and `x1` where the objective function, `f`, is 
+    certain to have a value of `yval`.
+    """
+    np.seterr(divide='raise', invalid='raise')
+    for iter in range(maxiter):
+        x = bisect(x0, x1)
+        y = f(x, *args)
+        if y > yval:
+            x1 = x
+            y1 = y
+        else:
+            x0 = x
+            y0 = y
+        if y0 is not None and y1 is not None: 
+            return Bracket(x0, x1, y0, y1)
+    raise SolverError(f'failed to converge after {maxiter} iterations')
+    
+def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
+                                                x0, x1, x2, dx, df0, xlast):
+    df1 = yval - y1
+    df2 = yval - y2
+    d01 = df0-df1
+    d02 = df0-df2
+    d12 = df1-df2
+    if all([d12, d02, d01]):
+        df0_d12 = df0 / d12
+        df1_d02 = df1 / d02
+        df2_d01 = df2 / d01
+        x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02
+        if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
+            x = bisect(x0, x1)
+    else:
+        x = iter_false_position(x0, x1, dx, y0, y1, yval, df0, xlast)
+    return x
+
+# %% Solvers
 
 def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """False position solver."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
+    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
     dx = x1 - x0
     df = yval - y0
     if x is None or not_within_bounds(x, x0, x1):
@@ -62,50 +126,12 @@ def bisection(f, x0, x1, yval=0., xtol=1e-6, ytol=1e-6, args=()):
         dx = x1 - x0
         x = bisect(x0, x1)
     return x
-    
-
-def not_within_bounds(x, x0, x1):
-    return not (x0 < x < x1 or x1 < x < x0)
-
-def iteration_is_getting_stuck(x, xlast, dx):
-    return abs((x - xlast) / dx) < 0.1
-
-def bisect(x0, x1):
-    return (x0 + x1) / 2.0
-
-def iter_false_position(x0, x1, dx, y0, y1, yval, df, xlast):
-    dy = y1 - y0
-    if dy:
-        x = x0 + df*dx/dy
-        if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
-            x = bisect(x0, x1)
-    else:
-        x = bisect(x0, x1)
-    return x
-
-def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
-                                                x0, x1, x2, dx, df0, xlast):
-    df1 = yval - y1
-    df2 = yval - y2
-    d01 = df0-df1
-    d02 = df0-df2
-    d12 = df1-df2
-    if all([d12, d02, d01]):
-        df0_d12 = df0 / d12
-        df1_d02 = df1 / d02
-        df2_d01 = df2 / d01
-        x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02
-        if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
-            x = bisect(x0, x1)
-    else:
-        x = iter_false_position(x0, x1, dx, y0, y1, yval, df0, xlast)
-    return x
 
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     """Inverse quadratic interpolation solver."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
+    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
     df0 = yval - y0
     dx = x1 - x0
     if x is None or not_within_bounds(x, x0, x1):
@@ -135,7 +161,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
     """False position solver with Wegstein acceleration."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
+    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
     dx = x1 - x0
     df = yval-y0
     if x is None or not_within_bounds(x, x0, x1):
@@ -183,7 +209,7 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol
     """False position solver with Aitken acceleration."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, args)
+    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
     dx1 = x1-x0
     df = yval-y0
     if x is None or not_within_bounds(x, x0, x1):
