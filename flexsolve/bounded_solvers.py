@@ -15,7 +15,7 @@ __all__ = ('false_position', 'bisection', 'bounded_wegstein',
 
 Bracket = namedtuple('Braket', ('x0', 'x1', 'y0', 'y1'), module=__name__)        
 
-def get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args):
+def get_default_bounds(f, x0, x1, y0, y1, yval, args):
     if y0 is None:
         y0 = f(x0, *args)
     if y1 is None:
@@ -87,7 +87,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol
     """False position solver."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
+    x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     dx = x1 - x0
     df = yval - y0
     if x is None or not_within_bounds(x, x0, x1):
@@ -131,7 +131,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
     """Inverse quadratic interpolation solver."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
+    x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     df0 = yval - y0
     dx = x1 - x0
     if x is None or not_within_bounds(x, x0, x1):
@@ -153,7 +153,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
             df0 = yval - y
         else: break
         dx = x1 - x0
-        x = estimate_by_inverse_quadratic_interpolation(yval, y0, y1, y2,
+        x = estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
                                                         x0, x1, x2, dx, df0, x)
     return x
 
@@ -161,7 +161,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
     """False position solver with Wegstein acceleration."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
+    x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     dx = x1 - x0
     df = yval-y0
     if x is None or not_within_bounds(x, x0, x1):
@@ -209,7 +209,7 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol
     """False position solver with Aitken acceleration."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
-    x0, y0, x1, y1 = get_default_bounds_bounds(f, x0, x1, y0, y1, yval, args)
+    x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     dx1 = x1-x0
     df = yval-y0
     if x is None or not_within_bounds(x, x0, x1):
