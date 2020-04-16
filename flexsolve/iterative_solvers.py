@@ -19,7 +19,7 @@ def fixed_point(f, x0, xtol, args=(), maxiter=50):
         x1 = f(x0, *args)
         if (np_abs(x1-x0) < xtol).all(): return x1
         x0 = x1
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, x1)
 
 def wegstein(f, x0, xtol, args=(), maxiter=50):
     """Iterative Wegstein solver."""
@@ -40,7 +40,7 @@ def wegstein(f, x0, xtol, args=(), maxiter=50):
         x0 = x1
         g0 = g1
         x1 = w*g1 + (1-w)*x1
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, g1)
 
 def conditional_wegstein(f, x0):
     """Conditional iterative Wegstein solver."""
@@ -81,7 +81,7 @@ def aitken(f, x, xtol, args=(), maxiter=50):
         dummy = dgg_g + dxg
         mask = np_abs(dummy) > 1e-16
         x[mask] -= dxg[mask]**2/dummy[mask]
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, gg)
     
 def conditional_aitken(f, x):
     """Conditional iterative Aitken solver."""

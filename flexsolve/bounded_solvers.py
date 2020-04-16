@@ -61,7 +61,7 @@ def find_bracket(f, x0, x1, y0=None, y1=None, yval=0, args=(), maxiter=50):
             y0 = y
         if y0 is not None and y1 is not None: 
             return Bracket(x0, x1, y0, y1)
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, Bracket(x0, x1, y0, y1))
     
 def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
                                                 x0, x1, x2, dx, df0, xlast):

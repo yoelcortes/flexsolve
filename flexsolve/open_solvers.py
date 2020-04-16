@@ -23,7 +23,7 @@ def secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         if _abs(dx) < xtol or _abs(y1) < ytol: return x1
         x0 = x1
         y0 = y1
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, x1)
     
 def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Wegstein acceleration."""
@@ -50,7 +50,7 @@ def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         if _abs(dx) < xtol or _abs(y1) < ytol: return x1
         y0 = y1
         g0 = g1
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, x1)
     
 def aitken_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Aitken acceleration."""
@@ -75,4 +75,4 @@ def aitken_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         x1 = x1 - dx**2./denominator if denominator else x2
         dx = x1 - x0
         y0 = y1
-    raise SolverError(f'failed to converge after {maxiter} iterations')
+    raise SolverError(maxiter, x2)
