@@ -6,7 +6,6 @@ Created on Wed Nov 20 23:09:53 2019
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from collections.abc import Iterable
 from copy import copy
 
 __all__ = ('Profiler',)
@@ -17,14 +16,8 @@ class Archive:
     
     def __init__(self, name, xs, ys):
         self.name = name
-        xs = np.array(xs, float)
-        if xs.ndim == 2:
-            xs = xs[:, 0]
-        self.xs = xs
-        ys = np.array(ys, float)
-        if ys.ndim == 2:
-            ys = ys[:, 0]
-        self.ys = ys
+        self.xs = np.array(xs, float)
+        self.ys = np.array(ys, float)
     
     def __len__(self):
         return len(self.xs)
@@ -88,7 +81,7 @@ class Profiler:
         for archive in archives:
             xs = archive.xs
             ys = archive.ys + offset
-            plt.scatter(xs, ys, label=f"{archive.name} ({archive.size})")
+            plt.scatter(xs, ys, label=f"{archive.name} ({archive.size} iterations)")
             offset -= step
 
     def plot(self, args=(), markbounds=True):
@@ -102,9 +95,7 @@ class Profiler:
         
         dx = (x_max - x_min) / 50
         xs = np.linspace(x_min - dx, x_max + dx)
-        def f(x):
-            y = self.f(x, *args)
-            return y[0] if isinstance(y, Iterable) else y
+        f = lambda x: self.f(x, *args)
         ys = np.array([f(x) for x in xs])
         plt.plot(xs, ys, color='grey')
         y_min = ys.min()

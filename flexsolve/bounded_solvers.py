@@ -7,13 +7,15 @@ Created on Tue Jul  9 00:35:01 2019
 import numpy as np
 from .exceptions import SolverError
 from collections import namedtuple
+from . import utils
 
 __all__ = ('false_position', 'bisection', 'bounded_wegstein',
            'bounded_aitken', 'IQ_interpolation', 'find_bracket')
 
 # %% Tools
 
-Bracket = namedtuple('Braket', ('x0', 'x1', 'y0', 'y1'), module=__name__)        
+Bracket = namedtuple('Braket', ('x0', 'x1', 'y0', 'y1'), module=__name__)
+del namedtuple        
 
 def get_default_bounds(f, x0, x1, y0, y1, yval, args):
     if y0 is None:
@@ -25,33 +27,13 @@ def get_default_bounds(f, x0, x1, y0, y1, yval, args):
     else:
         return x0, y0, x1, y1
 
-def not_within_bounds(x, x0, x1):
-    return not (x0 < x < x1 or x1 < x < x0)
-
-def iteration_is_getting_stuck(x, xlast, dx, r=0.1):
-    return abs((x - xlast) / dx) < r
-
-def bisect(x0, x1):
-    return (x0 + x1) / 2.0
-
-def iter_false_position(x0, x1, dx, y0, y1, yval, df, xlast):
-    dy = y1 - y0
-    if dy:
-        x = x0 + df*dx/dy
-        if not_within_bounds(x, x0, x1):
-            x = bisect(x0, x1)
-        elif iteration_is_getting_stuck(x, xlast, dx):
-            x = (x + x0 + x1) / 3
-    else:
-        x = bisect(x0, x1)
-    return x
-
 def find_bracket(f, x0, x1, y0=None, y1=None, yval=0, args=(), maxiter=50):
     """
     Return a bracket within `x0` and `x1` where the objective function, `f`, is 
     certain to have a value of `yval`.
     """
     np.seterr(divide='raise', invalid='raise')
+    bisect = utils.bisect
     for iter in range(maxiter):
         x = bisect(x0, x1)
         y = f(x, *args)
@@ -64,24 +46,6 @@ def find_bracket(f, x0, x1, y0=None, y1=None, yval=0, args=(), maxiter=50):
         if y0 is not None and y1 is not None: 
             return Bracket(x0, x1, y0, y1)
     raise SolverError(maxiter, Bracket(x0, x1, y0, y1))
-    
-def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
-                                                x0, x1, x2, dx, df0, xlast):
-    df1 = yval - y1
-    df2 = yval - y2
-    d01 = df0-df1
-    d02 = df0-df2
-    d12 = df1-df2
-    if all([d01, d02, d12]):
-        df0_d12 = df0 / d12
-        df1_d02 = df1 / d02
-        df2_d01 = df2 / d01
-        x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02
-        if not_within_bounds(x, x0, x1):
-            x = bisect(x0, x1)
-    else:
-        x = iter_false_position(x0, x1, dx, y0, y1, yval, df0, xlast)
-    return x
 
 # %% Solvers
 
@@ -92,8 +56,9 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     dx = x1 - x0
     df = yval - y0
-    if x is None or not_within_bounds(x, x0, x1):
-        x = iter_false_position(x0, x1, dx, y0, y1, yval, df, x0)
+    false_position_iter = utils.false_position_iter
+    if x is None or utils.not_within_bounds(x, x0, x1):
+        x = (x0, x1, dx, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
     while _abs(dx) > xtol:
@@ -107,7 +72,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
             df = yval - y0
         else: break
         dx = x1 - x0
-        x = iter_false_position(x0, x1, dx, y0, y1, yval, df, x)
+        x = false_position_iter(x0, x1, dx, y0, y1, yval, df, x)
     return x
 
 def bisection(f, x0, x1, yval=0., xtol=1e-6, ytol=1e-6, args=()):
@@ -117,6 +82,7 @@ def bisection(f, x0, x1, yval=0., xtol=1e-6, ytol=1e-6, args=()):
     yval_ub = yval + ytol
     yval_lb = yval - ytol
     dx = x1 - x0
+    bisect = utils.bisect
     x = bisect(x0, x1)
     while _abs(dx) > xtol:
         y = f(x, *args)
@@ -136,8 +102,8 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
     x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     df0 = yval - y0
     dx = x1 - x0
-    if x is None or not_within_bounds(x, x0, x1):
-        x = iter_false_position(x0, x1, dx, y0, y1, yval, df0, x0)
+    if x is None or utils.not_within_bounds(x, x0, x1):
+        x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df0, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
     while _abs(dx) > xtol:
@@ -155,8 +121,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
             df0 = yval - y
         else: break
         dx = x1 - x0
-        x = estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
-                                                        x0, x1, x2, dx, df0, x)
+        x = utils.IQ_iter(y0, y1, y2, yval, x0, x1, x2, dx, df0, x)
     return x
 
 def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
@@ -166,8 +131,8 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
     x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     dx = x1 - x0
     df = yval-y0
-    if x is None or not_within_bounds(x, x0, x1):
-        x = iter_false_position(x0, x1, dx, y0, y1, yval, df, x0)
+    if x is None or utils.not_within_bounds(x, x0, x1):
+        x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     xlast = x
     y = f(x, *args)
     yval_ub = yval + ytol
@@ -183,6 +148,8 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
         return x
     dx1x0 = x1-x0
     x = g0 = x0 + df*dx1x0/(y1-y0)
+    wegstein_iter = utils.scalar_wegstein_iter
+    not_within_bounds = utils.not_within_bounds
     while _abs(dx1x0) > xtol:
         y = f(x, *args)
         if y > yval_ub:
@@ -196,15 +163,10 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
         dx1x0 = x1-x0
         g1 = x0 + df*dx1x0/(y1-y0)
         dx = x - xlast
-        denominator = dx-g1+g0
         xlast = x
-        if denominator:
-            w = dx / denominator
-            x = w*g1 + (1.-w)*x
-            if not_within_bounds(x, x0, x1): x = g0 = g1
-            else: g0 = g1                
-        else:
-            x = g0 = g1
+        x = wegstein_iter(x, dx, g1, g0)
+        if not_within_bounds(x, x0, x1): x = g0 = g1
+        g1 = g0
     return x
        
 def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
@@ -214,10 +176,13 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     x0, y0, x1, y1 = get_default_bounds(f, x0, x1, y0, y1, yval, args)
     dx1 = x1-x0
     df = yval-y0
-    if x is None or not_within_bounds(x, x0, x1):
-        x = iter_false_position(x0, x1, dx1, y0, y1, yval, df, x0)
+    if x is None or utils.not_within_bounds(x, x0, x1):
+        x = utils.false_position_iter(x0, x1, dx1, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
+    aitken_iter = utils.scalar_aitken_iter
+    bisect = utils.bisect
+    not_within_bounds = utils.not_within_bounds
     while _abs(dx1) > xtol:
         y = f(x, *args)
         if y > yval_ub:
@@ -246,10 +211,6 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
         dx1 = x1-x0
         gg = x0 + df*dx1/(y1-y0)
         dxg = x - g
-        denominator = gg + dxg - g
-        xlast = x
-        if denominator:
-            x = xlast - dxg**2. / denominator
-        if not_within_bounds(x, x0, x1):
-            x = bisect(x0, x1)
+        x = aitken_iter(x, gg, dxg, gg - g)
+        if not_within_bounds(x, x0, x1): x = bisect(x0, x1)
     return x

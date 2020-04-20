@@ -19,12 +19,106 @@ quicker.
 Installation
 ------------
 
-TODO
+Get the latest version of flexsolve from `PyPI <https://pypi.python.org/pypi/flexsolve/>`__. If you have an installation of Python with pip, simple install it with:
+
+    $ pip install flexsolve
+
+To get the git version, run:
+
+    $ git clone git://github.com/yoelcortes/flexsolve
 
 Documentation
 -------------
 
-TODO
+No extensive documentation is available. However, the parameters of each
+solver are consitent and straight forward:
+
+**f**: objective function in the form of f(x, *args)
+
+**x**: Root guess
+
+**x0, x1**: Root bracket
+
+**xtol=1e-8**: Solver stops when the root lies within `xtol`.
+
+**ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
+
+**yval=0**: Root offset. Solver will find x where f(x) = `yval`.
+
+**args=()**: Arguments to pass to `f`.
+
+Flexsolve includes the following solvers:
+
+* For solving f(x) = x:
+  * fixed_point: Simple fixed point iteration.
+  * wegstein: Wegstein's acceleration method.
+  * aitken: Aitken-Steffensen acceleration method.
+* For solving f(x) = yval and x0 < x < x1:
+  * bisection: Simple bisection method
+  * false_position: Simple false position method.
+  * IQ_interpolation: Inter-quadratic interpolation (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
+  * bounded_wegstein: False position method with Wegstein acceleration.
+  * bounded_aitken: False position method with Aitken-Steffensen acceleration.
+* For solving f(x) = 0:
+  * secant: Simple secant method.
+  * wegstein_secant: Secant method with Wegstein acceleration.
+  * aitken_secant: Secant method with Aitken acceleration.
+
+Here are some exmples using flexsolve's Profiler object to test and compare
+different solvers.:
+
+```python
+import flexsolve as flx 
+from scipy import optimize as opt
+
+x0, x1 = [-5, 5]
+f = lambda x: x**3 - 40 + 2*x 
+p = flx.Profiler(f)
+x_brentq = opt.brentq(p, x0, x1, xtol=1e-8)
+p.archive('[Scipy] Brent-Q') # Save/archive results with given name
+x_brenth = opt.brenth(p, x0, x1)
+p.archive('[Scipy] Brent-H')
+x_IQ = flx.IQ_interpolation(p, x0, x1)
+p.archive('IQ-interpolation')
+x_wegstein = flx.bounded_wegstein(p, x0, x1)
+p.archive('Wegstein')
+x_aitken = flx.bounded_aitken(p, x0, x1)
+p.archive('Aitken')
+p.plot()
+```
+.. figure:: ./docs/images/Bounded x^3 - 40 + 2x.png
+
+```python
+p = flx.Profiler(f)
+x_guess = -5
+x_wegstein_secant = flx.wegstein_secant(p, x_guess)
+p.archive('Wegstein')
+x_aitken_secant = flx.aitken_secant(p, x_guess)
+p.archive('Aitken')
+x_secant = flx.secant(p, x_guess)
+p.archive('Secant')
+x_newton = opt.newton(p, x_guess)
+p.archive('[Scipy] Newton')
+p.plot()
+```
+.. figure:: ./docs/images/x = 40/x^2 - 2/x.png
+
+```python
+# Note that x = 40/x^2 - 2/x is the same
+# objective function as x**3 - 40 + 2*x = 0
+f = lambda x: 40/x**2 - 2/x
+p = flx.Profiler(f)
+x_guess = 5.
+x_wegstein = flx.wegstein(p, x_guess)
+p.archive('Wegstein')
+x_aitken = flx.aitken(p, x_guess)
+p.archive('Aitken')
+p.plot(markbounds=False)
+
+# Fixed iteration is non-convergent for this equation,
+# so we do not include it here
+```
+.. figure:: ./docs/images/x = x^3 - 40 + 2x.png
 
 Bug reports
 -----------
