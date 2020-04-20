@@ -87,7 +87,7 @@ different solvers.:
     p.archive('Aitken')
     p.plot()
 
-.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/tree/master/docs/images/bounded_solvers_example.png
+.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/bounded_solvers_example.png
 
 .. code-block:: python
 
@@ -103,7 +103,7 @@ different solvers.:
     p.archive('[Scipy] Newton')
     p.plot()
 
-.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/tree/master/docs/images/general_solvers_example.png
+.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
 
 .. code-block:: python
 
@@ -120,7 +120,7 @@ different solvers.:
     # Fixed iteration is non-convergent for this equation,
     # so we do not include it here
 
-.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/tree/master/docs/images/fixed_point_solvers_example.png
+.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/general_solvers_example.png
 
 Bug reports
 -----------
