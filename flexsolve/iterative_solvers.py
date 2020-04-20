@@ -11,7 +11,7 @@ __all__ = ('fixed_point',
            'wegstein', 'conditional_wegstein', 
            'aitken', 'conditional_aitken')
 
-def fixed_point(f, x0, xtol, args=(), maxiter=50):
+def fixed_point(f, x0, xtol=1e-8, args=(), maxiter=50):
     """Iterative fixed-point solver."""
     np.seterr(divide='raise', invalid='raise')
     np_abs = np.abs
@@ -21,7 +21,7 @@ def fixed_point(f, x0, xtol, args=(), maxiter=50):
         x0 = x1
     raise SolverError(maxiter, x1)
 
-def wegstein(f, x0, xtol, args=(), maxiter=50):
+def wegstein(f, x0, xtol=1e-8, args=(), maxiter=50):
     """Iterative Wegstein solver."""
     np.seterr(divide='raise', invalid='raise')
     x1 = g0 = f(x0, *args)
@@ -37,6 +37,7 @@ def wegstein(f, x0, xtol, args=(), maxiter=50):
         dummy = dx-g1+g0
         mask = np_abs(dummy) > 1e-16
         w[mask] = dx[mask]/dummy[mask]
+        w[mask==False] = 1
         x0 = x1
         g0 = g1
         x1 = w*g1 + (1-w)*x1
@@ -58,11 +59,12 @@ def conditional_wegstein(f, x0):
         dummy = dx-g1+g0
         mask = np_abs(dummy) > 1e-16
         w[mask] = dx[mask]/dummy[mask]
+        w[mask==False] = 1
         x0 = x1
         g0 = g1
         x1 = w*g1 + (1.-w)*x1
 
-def aitken(f, x, xtol, args=(), maxiter=50):
+def aitken(f, x, xtol=1e-8, args=(), maxiter=50):
     """Iterative Aitken solver."""
     np.seterr(divide='raise', invalid='raise')
     gg = x
@@ -81,6 +83,8 @@ def aitken(f, x, xtol, args=(), maxiter=50):
         dummy = dgg_g + dxg
         mask = np_abs(dummy) > 1e-16
         x[mask] -= dxg[mask]**2/dummy[mask]
+        invmask = mask == False
+        x[invmask] = gg[invmask]
     raise SolverError(maxiter, gg)
     
 def conditional_aitken(f, x):
@@ -102,3 +106,5 @@ def conditional_aitken(f, x):
         dummy = gg + dxg - g
         mask = np_abs(dummy) > 1e-16
         x[mask] -= dxg[mask]**2/dummy[mask]
+        invmask = mask == False
+        x[invmask] = gg[invmask]

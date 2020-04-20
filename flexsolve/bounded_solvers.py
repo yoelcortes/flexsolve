@@ -28,8 +28,8 @@ def get_default_bounds(f, x0, x1, y0, y1, yval, args):
 def not_within_bounds(x, x0, x1):
     return not (x0 < x < x1 or x1 < x < x0)
 
-def iteration_is_getting_stuck(x, xlast, dx):
-    return abs((x - xlast) / dx) < 0.1
+def iteration_is_getting_stuck(x, xlast, dx, r=0.1):
+    return abs((x - xlast) / dx) < r
 
 def bisect(x0, x1):
     return (x0 + x1) / 2.0
@@ -38,8 +38,10 @@ def iter_false_position(x0, x1, dx, y0, y1, yval, df, xlast):
     dy = y1 - y0
     if dy:
         x = x0 + df*dx/dy
-        if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
+        if not_within_bounds(x, x0, x1):
             x = bisect(x0, x1)
+        elif iteration_is_getting_stuck(x, xlast, dx):
+            x = (x + x0 + x1) / 3
     else:
         x = bisect(x0, x1)
     return x
@@ -70,7 +72,7 @@ def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
     d01 = df0-df1
     d02 = df0-df2
     d12 = df1-df2
-    if all([d12, d02, d01]):
+    if all([d01, d02, d12]):
         df0_d12 = df0 / d12
         df1_d02 = df1 / d02
         df2_d01 = df2 / d01
@@ -83,7 +85,7 @@ def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
 
 # %% Solvers
 
-def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
+def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """False position solver."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
@@ -127,7 +129,7 @@ def bisection(f, x0, x1, yval=0., xtol=1e-6, ytol=1e-6, args=()):
         x = bisect(x0, x1)
     return x
 
-def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
+def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """Inverse quadratic interpolation solver."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
@@ -157,7 +159,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
                                                         x0, x1, x2, dx, df0, x)
     return x
 
-def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
+def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """False position solver with Wegstein acceleration."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
@@ -166,7 +168,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
     df = yval-y0
     if x is None or not_within_bounds(x, x0, x1):
         x = iter_false_position(x0, x1, dx, y0, y1, yval, df, x0)
-    x_old = x
+    xlast = x
     y = f(x, *args)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
@@ -193,11 +195,11 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
         else: break
         dx1x0 = x1-x0
         g1 = x0 + df*dx1x0/(y1-y0)
-        dx = x - x_old
+        dx = x - xlast
         denominator = dx-g1+g0
+        xlast = x
         if denominator:
             w = dx / denominator
-            x_old = x
             x = w*g1 + (1.-w)*x
             if not_within_bounds(x, x0, x1): x = g0 = g1
             else: g0 = g1                
@@ -205,7 +207,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, yt
             x = g0 = g1
     return x
        
-def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
+def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """False position solver with Aitken acceleration."""
     np.seterr(divide='raise', invalid='raise')
     _abs = abs
@@ -245,9 +247,9 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-6, ytol
         gg = x0 + df*dx1/(y1-y0)
         dxg = x - g
         denominator = gg + dxg - g
+        xlast = x
         if denominator:
-            x = x - dxg**2. / denominator
+            x = xlast - dxg**2. / denominator
         if not_within_bounds(x, x0, x1):
-            # Add overshoot to prevent getting stuck
-            x = gg + 0.1*(x1+x0-2*gg)*(dx1/dx0)**3. 
+            x = bisect(x0, x1)
     return x

@@ -9,9 +9,10 @@ import numpy as np
 
 __all__ = ('secant', 'wegstein_secant', 'aitken_secant')
 
-def secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
+def secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     """Secant solver."""
     np.seterr(divide='raise', invalid='raise')
+    if x1 is None: x1 = x0 + xtol
     _abs = abs
     y0 = f(x0, *args)
     if _abs(y0) < ytol: return x0
@@ -25,9 +26,10 @@ def secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         y0 = y1
     raise SolverError(maxiter, x1)
     
-def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
+def wegstein_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Wegstein acceleration."""
     np.seterr(divide='raise', invalid='raise')
+    if x1 is None: x1 = x0 + xtol
     _abs = abs
     y0 = f(x0, *args)
     if _abs(y0) < ytol: return x0
@@ -41,10 +43,11 @@ def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         y1 = f(x1, *args)
         g1 = x1 - y1*dx/(y1-y0)
         x0 = x1
-        try:
-            w = dx/(dx-g1+g0)
+        denominator = dx-g1+g0
+        if denominator > xtol:
+            w = dx / denominator
             x1 = w*g1 + (1.-w)*x1
-        except:
+        else:
             x1 = g1
         dx = x1-x0
         if _abs(dx) < xtol or _abs(y1) < ytol: return x1
@@ -52,9 +55,10 @@ def wegstein_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         g0 = g1
     raise SolverError(maxiter, x1)
     
-def aitken_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
+def aitken_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Aitken acceleration."""
     np.seterr(divide='raise', invalid='raise')
+    if x1 is None: x1 = x0 + xtol
     _abs = abs
     y0 = f(x0, *args)
     if _abs(y0) < ytol: return x0
@@ -72,7 +76,7 @@ def aitken_secant(f, x0, x1, xtol, ytol=5e-8, args=(), maxiter=50):
         if _abs(dx) < xtol or _abs(y1) < ytol: return x2
         dx = x1 - x0 # x - g
         denominator = x2 + dx - x0
-        x1 = x1 - dx**2./denominator if denominator else x2
+        x1 = x1 - dx**2./denominator if abs(denominator) > xtol else x2
         dx = x1 - x0
         y0 = y1
     raise SolverError(maxiter, x2)
