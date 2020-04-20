@@ -87,7 +87,7 @@ different solvers.:
     p.archive('Aitken')
     p.plot()
 
-.. image:: `./docs/images/Bounded x^3 - 40 + 2x.png`
+.. image:: docs/bounded_solvers_example.png
 
 .. code-block:: python
 
@@ -103,7 +103,7 @@ different solvers.:
     p.archive('[Scipy] Newton')
     p.plot()
 
-.. image:: `./docs/images/x = 40/x^2 - 2/x.png`
+.. image:: docs/general_solvers_example.png
 
 .. code-block:: python
 
@@ -120,7 +120,7 @@ different solvers.:
     # Fixed iteration is non-convergent for this equation,
     # so we do not include it here
 
-.. image:: `./docs/images/x = x^3 - 40 + 2x.png`
+.. image:: docs/fixed_point_solvers_example.png
 
 Bug reports
 -----------
