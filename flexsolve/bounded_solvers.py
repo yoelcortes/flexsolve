@@ -29,7 +29,7 @@ def not_within_bounds(x, x0, x1):
     return not (x0 < x < x1 or x1 < x < x0)
 
 def iteration_is_getting_stuck(x, xlast, dx):
-    return abs((x - xlast) / dx) < 0.10
+    return abs((x - xlast) / dx) < 0.1
 
 def bisect(x0, x1):
     return (x0 + x1) / 2.0
@@ -75,7 +75,7 @@ def estimate_by_inverse_quadratic_interpolation(y0, y1, y2, yval,
         df1_d02 = df1 / d02
         df2_d01 = df2 / d01
         x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02
-        if not_within_bounds(x, x0, x1) or iteration_is_getting_stuck(x, xlast, dx):
+        if not_within_bounds(x, x0, x1):
             x = bisect(x0, x1)
     else:
         x = iter_false_position(x0, x1, dx, y0, y1, yval, df0, xlast)

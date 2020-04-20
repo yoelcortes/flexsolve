@@ -16,8 +16,7 @@ class Counter:
     def notify(self):
         print(f"{self.msg or 'counter'}: {self.N}")
         
-    def restart(self, msg=None, N=0, notify=True):
-        if notify: self.notify()
+    def restart(self, msg=None, N=0):
         self.msg = msg or self.msg
         self.N = N
         
