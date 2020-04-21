@@ -35,7 +35,7 @@ solver are consitent and straight forward:
 
 **f**: objective function in the form of f(x, *args)
 
-**x**: Root guess
+**x**: Root guess. Solver begins the iteration by evaluating f(x).
 
 **x0, x1**: Root bracket. Solution must lie within x0 and x1.
 
