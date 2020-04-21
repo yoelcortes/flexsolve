@@ -89,7 +89,7 @@ different solvers.:
     >>> x_aitken = flx.bounded_aitken(p, x0, x1)
     3.2252404627883218
     >>> p.archive('Aitken')
-    >>> p.plot(r'Bounded solvers: $f(x) = 0 = x^3 + 2 \cdot x - 40$')
+    >>> p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$ where $-5 < x < 5$')
 
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/bounded_solvers_example.png
 
@@ -109,7 +109,7 @@ different solvers.:
     >>> opt.newton(p, x_guess)
     3.2252404627918065
     >>> p.archive('[Scipy] Newton')
-    >>> p.plot(r'General solvers: $f(x) = 0 = x^3 + 2 \cdot x - 40$')
+    >>> p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$')
 
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
 
@@ -126,7 +126,7 @@ different solvers.:
     >>> flx.aitken(p, x_guess)
     3.2252404627250075
     >>> p.archive('Aitken')
-    >>> p.plot(r'General solvers: $f(x) = x = \frac{40}{x^2} - \frac{2}{x}$',
+    >>> p.plot(r'$f(x) = x = \frac{40}{x^2} - \frac{2}{x}$',
     ...        markbounds=False)
     >>> # Fixed iteration is non-convergent for this equation,
     >>> # so we do not include it here
