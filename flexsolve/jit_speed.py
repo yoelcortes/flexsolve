@@ -29,13 +29,6 @@ def speed_up():
     --------
     njitable
     
-    Notes
-    -----
-    Several computation-heavy functions in Thermosteam and BioSTEAM are already marked as 'njitable'.
-    This function serves to cut down the time required to perform Monte Carlo analysis.
-    
-    When running a simulation for the first time, the simulation will take much longer.
-    However, every simulation after the first will be about 35% faster.
     
     """
     for f, options in njitables:
