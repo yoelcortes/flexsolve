@@ -85,7 +85,7 @@ class Profiler:
             ys = archive.ys + offset
             plt.scatter(xs, ys, color=color,
                         label=f"{archive.name} ({archive.size} iterations)")
-            plt.plot(rxs, rys + offset, color=color, alpha=0.8)
+            plt.plot(rxs, rys + offset, color=color, alpha=0.85)
             offset -= step
 
     def plot(self, title=None, args=(), markbounds=True):
@@ -120,7 +120,7 @@ class Profiler:
         if markbounds and np.all(x_min == x_mins) and np.all(x_max == x_maxs):
             plt.vlines([x_min, x_solution, x_max],
                        [y_lb, y_lb, y_lb],
-                       [f(x_min), y_solution, f(x_max)],
+                       [f(x_min) + offset + step, y_solution, f(x_max) + offset + step],
                        linestyles = 'dashed',
                        color='grey')
             plt.xticks([x_min, x_solution, x_max], 
@@ -130,7 +130,8 @@ class Profiler:
         elif np.all(np.array([i.xs[0] for i in archives]) == x_start):
             plt.vlines([x_start, x_solution],
                        [y_lb, y_lb],
-                       [f(x_start), y_solution],
+                       [f(x_start) + offset + step,
+                        y_solution + offset + step],
                        linestyles = 'dashed',
                        color='grey')
             plt.xticks([x_start, x_solution],
