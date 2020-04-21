@@ -37,7 +37,7 @@ solver are consitent and straight forward:
 
 **x**: Root guess
 
-**x0, x1**: Root bracket
+**x0, x1**: Root bracket. Solution must lie within x0 and x1.
 
 **xtol=1e-8**: Solver stops when the root lies within `xtol`.
 
