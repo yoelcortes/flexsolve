@@ -20,7 +20,7 @@ x_wegstein = flx.bounded_wegstein(p, x0, x1)
 p.archive('Wegstein')
 x_aitken = flx.bounded_aitken(p, x0, x1)
 p.archive('Aitken')
-p.plot()
+p.plot(r'Bounded solvers: $f(x) = x^3 + 2 \cdot x - 40 = 0$')
 
 p = flx.Profiler(f)
 x_guess = -5
@@ -32,7 +32,7 @@ x_secant = flx.secant(p, x_guess)
 p.archive('Secant')
 x_newton = opt.newton(p, x_guess)
 p.archive('[Scipy] Newton')
-p.plot()
+p.plot(r'General solvers: $f(x) = x^3 + 2 \cdot x - 40 = 0$')
 
 # Note that x = 40/x^2 - 2/x is the same
 # objective function as x**3 - 40 + 2*x = 0
@@ -44,6 +44,6 @@ x_wegstein = flx.wegstein(p, x_guess)
 p.archive('Wegstein')
 x_aitken = flx.aitken(p, x_guess)
 p.archive('Aitken')
-p.plot(markbounds=False)
+p.plot(r'Iterative solvers: $f(x) = \frac{40}{x^2} - \frac{2}{x} = x$', markbounds=False)
 
 # ^ Fixed iteration is non-convergent for this equation

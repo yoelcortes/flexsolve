@@ -84,7 +84,7 @@ class Profiler:
             plt.scatter(xs, ys, label=f"{archive.name} ({archive.size} iterations)")
             offset -= step
 
-    def plot(self, args=(), markbounds=True):
+    def plot(self, title=None, args=(), markbounds=True):
         plt.figure()
         archives = self.archives
         archives.sort(key=lambda x: x.size)
@@ -142,6 +142,7 @@ class Profiler:
                        color='grey')
             plt.xticks([x_solution], ['solution'])
         
+        if title: plt.title(title)
         plt.ylim([y_lb, y_ub])
         plt.xlim([xs[0], xs[-1]])
         plt.tick_params(axis='both', which='both', length=0)
