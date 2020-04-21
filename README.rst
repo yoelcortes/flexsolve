@@ -33,23 +33,23 @@ Documentation
 No extensive documentation is available. However, the parameters of each
 solver are consitent and straight forward:
 
-**f**: objective function in the form of **f(x, *args)**
+**f**: objective function in the form of `f(x, *args)`.
 
-**x**: Root guess. Solver begins the iteration by evaluating **f(x, *args)**.
+**x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
 
-**x0, x1**: Root bracket. Solution must lie within **x0** and **x1**.
+**x0, x1**: Root bracket. Solution must lie within `x0` and `x1`.
 
-**xtol=1e-8**: Solver stops when the root lies within **xtol**.
+**xtol=1e-8**: Solver stops when the root lies within `xtol`.
 
-**ytol=5e-8**: Solver stops when the **f(x)** lies within **ytol** of the root.
+**ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
 
-**yval=0**: Root offset. Solver will find x where **f(x) = yval**.
+**yval=0**: Root offset. Solver will find x where f(x) = `yval`.
 
-**args=()**: Arguments to pass to **f**.
+**args=()**: Arguments to pass to `f`.
 
 Flexsolve includes the following solvers:
 
-* Find **x** where **f(x) = x**:
+* Solve x where f(x) = x:
 
   * fixed_point: Simple fixed point iteration.
 
@@ -57,7 +57,7 @@ Flexsolve includes the following solvers:
 
   * aitken: Aitken-Steffensen acceleration method.
 
-* Find **x** where **f(x) = yval** and **x0 < x < x1**:
+* Solve x where f(x) = yval and x0 < x < x1:
 
   * bisection: Simple bisection method
 
@@ -69,7 +69,7 @@ Flexsolve includes the following solvers:
 
   * bounded_aitken: False position method with Aitken-Steffensen acceleration.
 
-* Find **x** where **f(x) = 0**:
+* Solve x where f(x) = 0:
 
   * secant: Simple secant method.
 
