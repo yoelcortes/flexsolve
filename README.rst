@@ -148,7 +148,7 @@ help us relate the points to the curve (not an actual interval):
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
 
 If your project is need for speed, you can speed up calculations in flexsolve
-using the **speed_up()** method, which works by `njit <https://numba.pydata.org/numba-doc/dev/index.html>`__
+using the **speed_up()** method, which works by `jit <https://numba.pydata.org/numba-doc/dev/index.html>`__
 compiling computationally-heavy algorithms in flexsolve. The following example benchmarks flexsolve's speed
 with and without compiling:
 
