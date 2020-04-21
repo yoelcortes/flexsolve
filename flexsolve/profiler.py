@@ -76,12 +76,16 @@ class Profiler:
     def sizes(self):
         return {name: len(archive) for name, archive in self.archives.items()}
     
-    def _plot_points(self, offset, step):
+    def _plot_points(self, rxs, rys, offset, step):
+        cycle = plt.rcParams['axes.prop_cycle']
+        colors = cycle.by_key()['color']
         archives = self.archives
-        for archive in archives:
+        for color, archive in zip(colors, archives):
             xs = archive.xs
             ys = archive.ys + offset
-            plt.scatter(xs, ys, label=f"{archive.name} ({archive.size} iterations)")
+            plt.scatter(xs, ys, color=color,
+                        label=f"{archive.name} ({archive.size} iterations)")
+            plt.plot(rxs, rys + offset, color=color, alpha=0.75)
             offset -= step
 
     def plot(self, title=None, args=(), markbounds=True):
@@ -104,13 +108,11 @@ class Profiler:
         offset = (y_max - y_min) / 3
         step = 2 * offset / N
         offset -= step / 2
-        self._plot_points(offset, step)
+        self._plot_points(xs, ys, offset, step)
         plt.fill_between(xs, ys - offset, ys + offset,
-                         color='grey', alpha=0.25)
-        
-        
-        x_solution = np.mean([i.xs[-1] for i in archives])
-        
+                         color='grey', alpha=0.1)
+
+        x_solution = np.mean([i.xs[-1] for i in archives])        
         y_solution = f(x_solution)
         y_lb, y_ub = plt.ylim()
         

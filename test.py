@@ -32,7 +32,7 @@ x_secant = flx.secant(p, x_guess)
 p.archive('Secant')
 x_newton = opt.newton(p, x_guess)
 p.archive('[Scipy] Newton')
-p.plot(p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$'))
+p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$')
 
 # Note that x = 40/x^2 - 2/x is the same
 # objective function as x**3 - 40 + 2*x = 0
