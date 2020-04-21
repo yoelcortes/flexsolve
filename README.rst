@@ -50,18 +50,31 @@ solver are consitent and straight forward:
 Flexsolve includes the following solvers:
 
 * For solving f(x) = x:
+
   * fixed_point: Simple fixed point iteration.
+
   * wegstein: Wegstein's acceleration method.
+
   * aitken: Aitken-Steffensen acceleration method.
+
 * For solving f(x) = yval and x0 < x < x1:
+
   * bisection: Simple bisection method
+
   * false_position: Simple false position method.
+
   * IQ_interpolation: Inter-quadratic interpolation (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
+
   * bounded_wegstein: False position method with Wegstein acceleration.
+
   * bounded_aitken: False position method with Aitken-Steffensen acceleration.
+
 * For solving f(x) = 0:
+
   * secant: Simple secant method.
+
   * wegstein_secant: Secant method with Wegstein acceleration.
+
   * aitken_secant: Secant method with Aitken acceleration.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
