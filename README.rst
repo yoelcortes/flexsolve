@@ -74,7 +74,7 @@ Parameters for each solver are pretty consitent and straight forward:
 
 Here are some exmples using flexsolve's Profiler object to test and compare
 different solvers. In the graphs, the points are the solver iterations and 
-the line is f(x). The points are offset to make them more visible
+the lines represent f(x). The lines and points are offset to make them more visible
 (so the points are actually on the same curve!). The shaded area is just to 
 help us relate the points to the curve (not an actual interval):
 

@@ -85,7 +85,7 @@ class Profiler:
             ys = archive.ys + offset
             plt.scatter(xs, ys, color=color,
                         label=f"{archive.name} ({archive.size} iterations)")
-            plt.plot(rxs, rys + offset, color=color, alpha=0.75)
+            plt.plot(rxs, rys + offset, color=color, alpha=0.8)
             offset -= step
 
     def plot(self, title=None, args=(), markbounds=True):
@@ -101,15 +101,15 @@ class Profiler:
         xs = np.linspace(x_min - dx, x_max + dx)
         f = lambda x: self.f(x, *args)
         ys = np.array([f(x) for x in xs])
-        plt.plot(xs, ys, color='grey')
         y_min = ys.min()
         y_max = ys.max()
         N = len(archives)
-        offset = (y_max - y_min) / 3
+        X = max(12 - 2*N, 3)
+        offset = (y_max - y_min) / X
         step = 2 * offset / N
         offset -= step / 2
         self._plot_points(xs, ys, offset, step)
-        plt.fill_between(xs, ys - offset, ys + offset,
+        plt.fill_between(xs, ys - offset - step, ys + offset + step,
                          color='grey', alpha=0.1)
 
         x_solution = np.mean([i.xs[-1] for i in archives])        
