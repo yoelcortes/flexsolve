@@ -4,7 +4,9 @@ flexsolve: Flexible function solvers
 .. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
    :target: https://github.com/yoelcortes/flexsolve/blob/master/LICENSE.txt
    :alt: license
-
+.. image:: http://img.shields.io/pypi/v/flexsolve.svg?style=flat
+   :target: https://pypi.python.org/pypi/flexsolve
+   :alt: Version_status
 
 .. contents::
 
