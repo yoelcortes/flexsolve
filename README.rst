@@ -117,7 +117,7 @@ different solvers:
     >>> p.archive('[Scipy] Newton')
     >>> p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$')
 
-.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
+.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/general_solvers_example.png
 
 .. code-block:: python
 
@@ -137,7 +137,7 @@ different solvers:
     >>> # Fixed iteration is non-convergent for this equation,
     >>> # so we do not include it here
 
-.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/general_solvers_example.png
+.. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
 
 Bug reports
 -----------
