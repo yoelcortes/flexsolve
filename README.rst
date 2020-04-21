@@ -79,7 +79,7 @@ different solvers:
     >>> from scipy import optimize as opt
     >>> x0, x1 = [-5, 5]
     >>> f = lambda x: x**3 - 40 + 2*x 
-    >>> p = flx.Profiler(f)
+    >>> p = flx.Profiler(f) # When called, it returns f(x) and saves the results.
     >>> opt.brentq(p, x0, x1, xtol=1e-8)
     3.225240462778411
     >>> p.archive('[Scipy] Brent-Q') # Save/archive results with given name
