@@ -32,7 +32,7 @@ To get the git version, run:
 Documentation
 -------------
 
-Flexsolve includes the following solvers:
+Flexsolve solvers can solve a variety of specifications:
 
 * Solve x where f(x) = x:
 
@@ -100,7 +100,8 @@ help us relate the points to the curve (not an actual interval):
     >>> x_aitken = flx.bounded_aitken(p, x0, x1)
     3.2252404627883218
     >>> p.archive('Aitken')
-    >>> x_false_position = flx.false_position(p, x0, x1)
+    >>> flx.false_position(p, x0, x1)
+    3.225240462687035
     >>> p.archive('False position')
     >>> p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$ where $-5 < x < 5$')
 
@@ -165,6 +166,12 @@ with and without compiling:
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
     11.3 µs ± 156 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
     
+The iterative methods for solving f(x) = x (e.g. fixed-point, Wegstain, Aitken) are 
+capable of solving multi-dimensional problems. Simply make sure x is an array 
+and f(x) returns an array with the same dimensions. In fact, the
+`The Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
+uses flexsolve to solve many chemical engineering problems, including 
+process recycle stream flow rates and vapor-liquid equilibrium compositions.
 
 Bug reports
 -----------
