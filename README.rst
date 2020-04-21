@@ -40,7 +40,7 @@ Flexsolve includes the following solvers:
 
   * **aitken**: Aitken-Steffensen acceleration method.
 
-* Solve x where f(x) = yval and x0 < x < x1:
+* Solve x where f(x) = 0 and x0 < x < x1:
 
   * **bisection**: Simple bisection method
 
