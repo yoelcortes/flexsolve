@@ -36,9 +36,9 @@ Flexsolve includes the following solvers:
 
   * **fixed_point**: Simple fixed point iteration.
 
-  * **wegstein**: Wegstein's acceleration method.
+  * **wegstein**: Wegstein's accelerated iteration method.
 
-  * **aitken**: Aitken-Steffensen acceleration method.
+  * **aitken**: Aitken-Steffensen accelerated iteration method.
 
 * Solve x where f(x) = 0 and x0 < x < x1:
 
