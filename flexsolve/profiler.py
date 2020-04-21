@@ -120,7 +120,7 @@ class Profiler:
         if markbounds and np.all(x_min == x_mins) and np.all(x_max == x_maxs):
             plt.vlines([x_min, x_solution, x_max],
                        [y_lb, y_lb, y_lb],
-                       [f(x_min) + offset + step, y_solution, f(x_max) + offset + step],
+                       [f(x_min) + offset + step, y_solution + offset + step, f(x_max) + offset + step],
                        linestyles = 'dashed',
                        color='grey')
             plt.xticks([x_min, x_solution, x_max], 
