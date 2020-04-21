@@ -71,7 +71,10 @@ Parameters for each solver are pretty consitent and straight forward:
 * **args=()**: Arguments to pass to `f`.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
-different solvers:
+different solvers. In the graphs, the points are the solver iterations and 
+the line is f(x). The points are offset to make them more visible
+(so the points are actually on the same curve!). The shaded area is just to 
+help us relate the points to the curve (not an actual interval):
 
 .. code-block:: python
 
