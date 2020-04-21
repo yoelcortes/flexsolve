@@ -60,8 +60,7 @@ Flexsolve includes the following solvers:
 
   * aitken_secant: Secant method with Aitken acceleration.
 
-No extensive documentation is available. However, the parameters of each
-solver are consitent and straight forward:
+Parameters for each solver are pretty consitent and straight forward:
 
 * **f**: objective function in the form of `f(x, *args)`.
 * **x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
@@ -72,7 +71,7 @@ solver are consitent and straight forward:
 * **args=()**: Arguments to pass to `f`.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
-different solvers.:
+different solvers:
 
 .. code-block:: python
 
