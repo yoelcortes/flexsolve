@@ -29,7 +29,6 @@ def speed_up():
     --------
     njitable
     
-    
     """
     for f, options in njitables:
         module = sys.modules[f.__module__]

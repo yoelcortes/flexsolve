@@ -100,6 +100,8 @@ help us relate the points to the curve (not an actual interval):
     >>> x_aitken = flx.bounded_aitken(p, x0, x1)
     3.2252404627883218
     >>> p.archive('Aitken')
+    >>> x_false_position = flx.false_position(p, x0, x1)
+    >>> p.archive('False position')
     >>> p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$ where $-5 < x < 5$')
 
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/bounded_solvers_example.png
@@ -143,6 +145,26 @@ help us relate the points to the curve (not an actual interval):
     >>> # so we do not include it here
 
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
+
+If your project is need for speed, you can speed up calculations in flexsolve
+using the **speed_up()** method, which works by `njit <https://numba.pydata.org/numba-doc/dev/index.html>`__
+compiling computationally-heavy algorithms in flexsolve. The following example benchmarks flexsolve's speed
+with and without compiling:
+
+.. code-block:: python
+
+    >>> import flexsolve as flx
+    >>> f = lambda x: x**3 - 40 + 2*x 
+    >>> # Time solver without compiling
+    >>> %timeit flx.IQ_interpolation(f, -5, 5)
+    38.3 µs ± 4.7 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+    >>> flx.speed_up() # This is the line we need to run to speed up flexsolve
+    >>> # First run is slower because it need to compile
+    >>> x = flx.IQ_interpolation(f, -5, 5) 
+    >>> # Time solver after compiling
+    >>> %timeit flx.IQ_interpolation(f, -5, 5)
+    11.3 µs ± 156 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+    
 
 Bug reports
 -----------

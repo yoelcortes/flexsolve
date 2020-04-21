@@ -22,6 +22,7 @@ def array_wegstein_iter(x, dx, g1, g0):
     w[mask] = dx[mask]/denominator[mask]
     return w*g1 + (1.-w)*x
 
+@njitable
 def scalar_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
     if abs(denominator) > 1e-16:
@@ -40,6 +41,7 @@ def array_aitken_iter(x, gg, dxg, dgg_g):
     x[nmask] = gg[nmask]
     return x
 
+@njitable
 def scalar_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     if abs(denominator) > 1e-16:

@@ -14,7 +14,7 @@ setup(
     description='Flexible function solvers',
     long_description=open('README.rst').read(),
     author='Yoel Cortes-Pena',
-    install_requires=['numpy'],
+    install_requires=['numba==0.48.0', 'llvmlite>=0.32', 'numpy'],
     python_requires=">=3.6",
     package_data=
         {'flexsolve': []},

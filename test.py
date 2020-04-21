@@ -7,6 +7,8 @@ Created on Sun Apr 19 17:12:04 2020
 import flexsolve as flx 
 from scipy import optimize as opt
 
+# %% Profile solvers
+
 x0, x1 = [-5, 5]
 f = lambda x: x**3 - 40 + 2*x 
 p = flx.Profiler(f)
@@ -20,6 +22,8 @@ x_wegstein = flx.bounded_wegstein(p, x0, x1)
 p.archive('Wegstein')
 x_aitken = flx.bounded_aitken(p, x0, x1)
 p.archive('Aitken')
+x_false_position = flx.false_position(p, x0, x1)
+p.archive('False position')
 p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$ where $-5 < x < 5$')
 
 p = flx.Profiler(f)
@@ -36,7 +40,6 @@ p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$')
 
 # Note that x = 40/x^2 - 2/x is the same
 # objective function as x**3 - 40 + 2*x = 0
-
 f = lambda x: 40/x**2 - 2/x
 p = flx.Profiler(f)
 x_guess = 5.
@@ -45,5 +48,4 @@ p.archive('Wegstein')
 x_aitken = flx.aitken(p, x_guess)
 p.archive('Aitken')
 p.plot(r'$f(x) = x = \frac{40}{x^2} - \frac{2}{x}$', markbounds=False)
-
 # ^ Fixed-point iteration is non-convergent for this equation

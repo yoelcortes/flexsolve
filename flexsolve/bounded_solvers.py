@@ -58,7 +58,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     df = yval - y0
     false_position_iter = utils.false_position_iter
     if x is None or utils.not_within_bounds(x, x0, x1):
-        x = (x0, x1, dx, y0, y1, yval, df, x0)
+        x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
     while _abs(dx) > xtol:
