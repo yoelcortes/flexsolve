@@ -33,19 +33,19 @@ Documentation
 No extensive documentation is available. However, the parameters of each
 solver are consitent and straight forward:
 
-**f**: objective function in the form of f(x, *args)
+_**f**_: objective function in the form of f(x, *args)
 
-**x**: Root guess. Solver begins the iteration by evaluating f(x).
+_**x**_: Root guess. Solver begins the iteration by evaluating f(x).
 
-**x0, x1**: Root bracket. Solution must lie within x0 and x1.
+_**x0, x1**_: Root bracket. Solution must lie within x0 and x1.
 
-**xtol=1e-8**: Solver stops when the root lies within `xtol`.
+_**xtol=1e-8**_: Solver stops when the root lies within `xtol`.
 
-**ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
+_**ytol=5e-8**_: Solver stops when the f(x) lies within `ytol` of the root.
 
-**yval=0**: Root offset. Solver will find x where f(x) = `yval`.
+_**yval=0**_: Root offset. Solver will find x where f(x) = `yval`.
 
-**args=()**: Arguments to pass to `f`.
+_**args=()**_: Arguments to pass to `f`.
 
 Flexsolve includes the following solvers:
 
