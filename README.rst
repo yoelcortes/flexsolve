@@ -158,7 +158,7 @@ with and without compiling:
     >>> # Time solver without compiling
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
     38.3 µs ± 4.7 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
-    >>> flx.speed_up() # This is the line we need to run to speed up flexsolve
+    >>> flx.speed_up() # This is the only line we need to run to speed up flexsolve
     >>> # First run is slower because it need to compile
     >>> x = flx.IQ_interpolation(f, -5, 5) 
     >>> # Time solver after compiling
