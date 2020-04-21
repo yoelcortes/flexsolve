@@ -30,23 +30,6 @@ To get the git version, run:
 Documentation
 -------------
 
-No extensive documentation is available. However, the parameters of each
-solver are consitent and straight forward:
-
-**f**: objective function in the form of `f(x, *args)`.
-
-**x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
-
-**x0, x1**: Root bracket. Solution must lie within `x0` and `x1`.
-
-**xtol=1e-8**: Solver stops when the root lies within `xtol`.
-
-**ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
-
-**yval=0**: Root offset. Solver will find x where f(x) = `yval`.
-
-**args=()**: Arguments to pass to `f`.
-
 Flexsolve includes the following solvers:
 
 * Solve x where f(x) = x:
@@ -76,6 +59,17 @@ Flexsolve includes the following solvers:
   * wegstein_secant: Secant method with Wegstein acceleration.
 
   * aitken_secant: Secant method with Aitken acceleration.
+
+No extensive documentation is available. However, the parameters of each
+solver are consitent and straight forward:
+
+* **f**: objective function in the form of `f(x, *args)`.
+* **x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
+* **x0, x1**: Root bracket. Solution must lie within `x0` and `x1`.
+* **xtol=1e-8**: Solver stops when the root lies within `xtol`.
+* **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
+* **yval=0**: Root offset. Solver will find x where f(x) = `yval`.
+* **args=()**: Arguments to pass to `f`.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
 different solvers.:
