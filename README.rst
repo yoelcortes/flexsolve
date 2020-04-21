@@ -34,31 +34,31 @@ Flexsolve includes the following solvers:
 
 * Solve x where f(x) = x:
 
-  * fixed_point: Simple fixed point iteration.
+  * **fixed_point**: Simple fixed point iteration.
 
-  * wegstein: Wegstein's acceleration method.
+  * **wegstein**: Wegstein's acceleration method.
 
-  * aitken: Aitken-Steffensen acceleration method.
+  * **aitken**: Aitken-Steffensen acceleration method.
 
 * Solve x where f(x) = yval and x0 < x < x1:
 
-  * bisection: Simple bisection method
+  * **bisection**: Simple bisection method
 
-  * false_position: Simple false position method.
+  * **false_position**: Simple false position method.
 
-  * IQ_interpolation: Inter-quadratic interpolation (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
+  * **IQ_interpolation**: Inter-quadratic interpolation (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
 
-  * bounded_wegstein: False position method with Wegstein acceleration.
+  * **bounded_wegstein**: False position method with Wegstein acceleration.
 
-  * bounded_aitken: False position method with Aitken-Steffensen acceleration.
+  * **bounded_aitken**: False position method with Aitken-Steffensen acceleration.
 
 * Solve x where f(x) = 0:
 
-  * secant: Simple secant method.
+  * **secant**: Simple secant method.
 
-  * wegstein_secant: Secant method with Wegstein acceleration.
+  * **wegstein_secant**: Secant method with Wegstein acceleration.
 
-  * aitken_secant: Secant method with Aitken acceleration.
+  * **aitken_secant**: Secant method with Aitken acceleration.
 
 Parameters for each solver are pretty consitent and straight forward:
 
