@@ -139,7 +139,7 @@ help us relate the points to the curve (not an actual interval):
     >>> p.archive('Aitken')
     >>> p.plot(r'$f(x) = x = \frac{40}{x^2} - \frac{2}{x}$',
     ...        markbounds=False)
-    >>> # Fixed iteration is non-convergent for this equation,
+    >>> # Fixed-point iteration is non-convergent for this equation,
     >>> # so we do not include it here
 
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png

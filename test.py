@@ -46,4 +46,4 @@ x_aitken = flx.aitken(p, x_guess)
 p.archive('Aitken')
 p.plot(r'$f(x) = x = \frac{40}{x^2} - \frac{2}{x}$', markbounds=False)
 
-# ^ Fixed iteration is non-convergent for this equation
+# ^ Fixed-point iteration is non-convergent for this equation
