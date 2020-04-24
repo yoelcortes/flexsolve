@@ -27,7 +27,7 @@ p.archive('False position')
 p.plot(r'$f(x) = 0 = x^3 + 2 \cdot x - 40$ where $-5 < x < 5$')
 
 p = flx.Profiler(f)
-x_guess = -5
+x_guess = 5
 x_wegstein_secant = flx.wegstein_secant(p, x_guess)
 p.archive('Wegstein')
 x_aitken_secant = flx.aitken_secant(p, x_guess)
