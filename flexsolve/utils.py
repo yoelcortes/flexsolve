@@ -17,7 +17,7 @@ def get_aitken_iter_function(x):
 @njitable
 def array_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
-    mask = np.abs(denominator) > 1e-16
+    mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dx) < 1e16)
     w = np.ones_like(dx)
     w[mask] = dx[mask]/denominator[mask]
     return w*g1 + (1.-w)*x
@@ -25,7 +25,7 @@ def array_wegstein_iter(x, dx, g1, g0):
 @njitable
 def scalar_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
-    if abs(denominator) > 1e-16:
+    if abs(denominator) > 1e-16 and abs(dx) < 1e16:
         w = dx / denominator
         x = w*g1 + (1.-w)*x
     else:
@@ -35,7 +35,7 @@ def scalar_wegstein_iter(x, dx, g1, g0):
 @njitable
 def array_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
-    mask = np.abs(denominator) > 1e-16
+    mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dxg) < 1e16)
     x[mask] -= dxg[mask]**2/denominator[mask]
     nmask = np.logical_not(mask)
     x[nmask] = gg[nmask]
@@ -44,7 +44,7 @@ def array_aitken_iter(x, gg, dxg, dgg_g):
 @njitable
 def scalar_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
-    if abs(denominator) > 1e-16:
+    if abs(denominator) > 1e-16 and abs(dxg) < 1e16:
         x -= dxg**2 / denominator 
     else:
         x = gg
