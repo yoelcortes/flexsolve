@@ -15,7 +15,6 @@ __all__ = ('fixed_point',
 
 def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50):
     """Iterative fixed-point solver."""
-    np.seterr(divide='raise', invalid='raise')
     np_abs = np.abs
     x0 = x
     for iter in range(maxiter):
@@ -26,7 +25,6 @@ def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50):
 
 def wegstein(f, x, xtol=1e-8, args=(), maxiter=50):
     """Iterative Wegstein solver."""
-    np.seterr(divide='raise', invalid='raise')
     x0 = x
     x1 = g0 = f(x0, *args)
     wegstein_iter = utils.get_wegstein_iter_function(x)
@@ -44,7 +42,6 @@ def wegstein(f, x, xtol=1e-8, args=(), maxiter=50):
 
 def conditional_wegstein(f, x):
     """Conditional iterative Wegstein solver."""
-    np.seterr(divide='raise', invalid='raise')
     x0 = x
     g0, condition = f(x0)
     g1 = x1 = g0
@@ -61,7 +58,6 @@ def conditional_wegstein(f, x):
 
 def aitken(f, x, xtol=1e-8, args=(), maxiter=50):
     """Iterative Aitken solver."""
-    np.seterr(divide='raise', invalid='raise')
     gg = x
     x = copy(x)
     aitken_iter = utils.get_aitken_iter_function(x)
@@ -80,7 +76,6 @@ def aitken(f, x, xtol=1e-8, args=(), maxiter=50):
     
 def conditional_aitken(f, x):
     """Conditional iterative Aitken solver."""
-    np.seterr(divide='raise', invalid='raise')
     condition = True
     x = copy(x)
     gg = x

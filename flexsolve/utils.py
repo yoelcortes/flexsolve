@@ -8,6 +8,8 @@ from .jit_speed import njitable
 from collections.abc import Iterable
 import numpy as np
 
+np.seterr(divide='raise', invalid='raise')
+
 def get_wegstein_iter_function(x):
     return array_wegstein_iter if isinstance(x, Iterable) else scalar_wegstein_iter
 

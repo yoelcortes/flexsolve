@@ -11,6 +11,7 @@ from . import iterative_solvers
 from . import exceptions
 from . import profiler
 from . import utils
+from . import fast
 
 __all__ = (*open_solvers.__all__,
            *bounded_solvers.__all__,
@@ -18,7 +19,9 @@ __all__ = (*open_solvers.__all__,
            *exceptions.__all__,
            *profiler.__all__,
            *jit_speed.__all__,
-           'utils')
+           'utils',
+           'fast',
+)
 
 from .jit_speed import *
 from .open_solvers import *
