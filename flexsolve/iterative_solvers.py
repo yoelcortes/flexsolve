@@ -1,27 +1,92 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 19 22:57:42 2019
+Created on Tue Apr 28 16:56:59 2020
 
 @author: yoelr
 """
-from .exceptions import SolverError
-from . import utils
 import numpy as np
+from collections import deque
+from .exceptions import SolverError
 from copy import copy
+from numpy import linalg
+from . import utils
 
 __all__ = ('fixed_point',
-           'wegstein', 'conditional_wegstein', 
-           'aitken', 'conditional_aitken')
+           'conditional_fixed_point',
+           'wegstein',
+           'conditional_wegstein',
+           'aitken',
+           'conditional_aitken',
+) 
 
-def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50):
-    """Iterative fixed-point solver."""
-    np_abs = np.abs
+class LeastSquaresIteration:
+    __slots__ = ('guess_history', 'error_history', 
+                 'N_count', 'N_start', '_b')
+    def __init__(self, N_history=5, N_start=20):
+        self.N_count = 0
+        self.N_start = N_start
+        self.guess_history = deque(maxlen=N_history)
+        self.error_history = deque(maxlen=N_history)
+
+    def reset(self):
+        self.N_count = 0
+        self.guess_history.clear()
+        self.error_history.clear()
+
+    def __call__(self, x, fx):
+        guess_history = self.guess_history
+        error_history = self.error_history
+        if guess_history: 
+            error_history.append(fx - x)
+        else:
+            self._b = np.ones_like(x)
+        if self.N_count == self.N_start:
+            A = np.array(error_history).transpose()
+            weights = linalg.lstsq(A, self._b, None)[0]
+            weights /= weights.sum()
+            xs = np.array(guess_history).transpose()
+            x_guess = 0.95 * (xs @ weights) + 0.05 * fx
+        else:
+            self.N_count += 1
+            x_guess = fx
+        guess_history.append(x_guess)
+        return x_guess
+
+def fake_least_squares(x, fx): return fx
+
+def as_least_squares(lstsq):
+    if lstsq: 
+        if isinstance(lstsq, LeastSquaresIteration):
+            lstsq.reset()
+        else:
+            lstsq = LeastSquaresIteration()
+    else:
+        lstsq = fake_least_squares
+    return lstsq
+
+def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=None):
+    """Iterative fixed-point solver. If `lstsq` is True, the least-squares 
+    solution of a matrix of previous iterations will be partially used to
+    iteratively esmitate the root."""
+    lstsq = as_least_squares(lstsq)
     x0 = x
     for iter in range(maxiter):
         x1 = f(x0, *args)
-        if (np_abs(x1-x0) < xtol).all(): return x1
-        x0 = x1
+        if (np.abs(x1-x0) < xtol).all(): return x1
+        x0 = lstsq(x0, x1)
     raise SolverError(maxiter, x1)
+
+def conditional_fixed_point(f, x, lstsq=None):
+    """Conditional iterative fixed-point solver. If `lstsq` is True, the
+    least-squares solution of a matrix of iterations will be partially used
+    to iteratively esmitate the root."""
+    lstsq = as_least_squares(lstsq)
+    condition = True
+    x0 = x
+    while condition:
+        x1, condition = f(x0)
+        x0 = lstsq(x0, x1)
+    return x
 
 def wegstein(f, x, xtol=1e-8, args=(), maxiter=50):
     """Iterative Wegstein solver."""
@@ -51,6 +116,7 @@ def conditional_wegstein(f, x):
         except:
             x1 = g1
             g1, condition = f(x1)
+        g1 = g1
         dx = x1-x0
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
