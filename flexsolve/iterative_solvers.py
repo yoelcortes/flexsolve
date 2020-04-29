@@ -22,13 +22,15 @@ __all__ = ('fixed_point',
 class LeastSquaresIteration:
     __slots__ = ('guess_history', 'error_history', 
                  'N_count', 'N_start', '_b')
-    def __init__(self, N_history=5, N_start=20):
+    def __init__(self, x, N_history=5, N_start=20):
+        self._b = np.ones_like(x)
         self.N_count = 0
         self.N_start = N_start
         self.guess_history = deque(maxlen=N_history)
         self.error_history = deque(maxlen=N_history)
 
-    def reset(self):
+    def reset(self, x):
+        self._b = np.ones_like(x)
         self.N_count = 0
         self.guess_history.clear()
         self.error_history.clear()
@@ -36,16 +38,16 @@ class LeastSquaresIteration:
     def __call__(self, x, fx):
         guess_history = self.guess_history
         error_history = self.error_history
-        if guess_history: 
-            error_history.append(fx - x)
-        else:
-            self._b = np.ones_like(x)
+        error_history.append(fx - x)
         if self.N_count == self.N_start:
-            A = np.array(error_history).transpose()
-            weights = linalg.lstsq(A, self._b, None)[0]
-            weights /= weights.sum()
-            xs = np.array(guess_history).transpose()
-            x_guess = 0.95 * (xs @ weights) + 0.05 * fx
+            try:
+                A = np.array(error_history).transpose()
+                weights = linalg.lstsq(A, A.mean() * self._b, None)[0]
+                weights /= weights.sum()
+                xs = np.array(guess_history).transpose()
+                x_guess = 0.95 * (xs @ weights) + 0.05 * fx
+            except:
+                x_guess = fx
         else:
             self.N_count += 1
             x_guess = fx
@@ -54,21 +56,21 @@ class LeastSquaresIteration:
 
 def fake_least_squares(x, fx): return fx
 
-def as_least_squares(lstsq):
+def as_least_squares(lstsq, x):
     if lstsq: 
         if isinstance(lstsq, LeastSquaresIteration):
-            lstsq.reset()
+            lstsq.reset(x)
         else:
-            lstsq = LeastSquaresIteration()
+            lstsq = LeastSquaresIteration(x)
     else:
         lstsq = fake_least_squares
     return lstsq
 
 def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=None):
     """Iterative fixed-point solver. If `lstsq` is True, the least-squares 
-    solution of a matrix of previous iterations will be partially used to
+    solution of a matrix of prior iterations may be partially used to
     iteratively esmitate the root."""
-    lstsq = as_least_squares(lstsq)
+    lstsq = as_least_squares(lstsq, x)
     x0 = x
     for iter in range(maxiter):
         x1 = f(x0, *args)
@@ -78,9 +80,9 @@ def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=None):
 
 def conditional_fixed_point(f, x, lstsq=None):
     """Conditional iterative fixed-point solver. If `lstsq` is True, the
-    least-squares solution of a matrix of iterations will be partially used
+    least-squares solution of a matrix of prior iterations may be partially used
     to iteratively esmitate the root."""
-    lstsq = as_least_squares(lstsq)
+    lstsq = as_least_squares(lstsq, x)
     condition = True
     x0 = x
     while condition:
