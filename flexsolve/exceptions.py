@@ -5,11 +5,21 @@ Created on Tue Nov 19 23:40:01 2019
 @author: yoelr
 """
 
-__all__ = ('SolverError',)
+__all__ = ('InfeasibleRegion',
+           'ConvergenceError',
+           'SolverError',)
 
-class SolverError(RuntimeError):
-    """RuntimeError regarding solvers."""
+class InfeasibleRegion(RuntimeError):
+    """Runtime error regarding infeasible processes."""
+    def __init__(self, process): super().__init__(process + ' is infeasible')
+
+class ConvergenceError(RuntimeError):
+    """RuntimeError regarding convergence problems."""
+
+class SolverError(ConvergenceError):
+    """RuntimeError regarding solver exceeding maximum number of iterations."""
     
     def __init__(self, maxiter, x):
         super().__init__(f'failed to converge after {maxiter} iterations')
         self.x = x
+        
