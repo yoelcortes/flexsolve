@@ -57,7 +57,7 @@ class LeastSquaresIteration:
         if self.active:
             A = np.array(error_history)
             A = A.transpose()
-            weights = linalg.lstsq(A, 1e-16 * self.b, None)[0]
+            weights = linalg.lstsq(A, self.b, None)[0]
             weights /= weights.sum()
             xs = np.array(guess_history).transpose()
             x_guess = xs @ weights
