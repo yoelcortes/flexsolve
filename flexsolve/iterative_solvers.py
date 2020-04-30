@@ -19,39 +19,40 @@ __all__ = ('fixed_point',
            'conditional_aitken',
 ) 
 
+
 class LeastSquaresIteration:
     __slots__ = ('guess_history', 'error_history', 
-                 'N_count', 'N_start', '_b')
-    def __init__(self, x, N_history=5, N_start=20):
+                 'N_count', '_b')
+    def __init__(self, x, N_history=5):
         self._b = np.ones_like(x)
         self.N_count = 0
-        self.N_start = N_start
         self.guess_history = deque(maxlen=N_history)
         self.error_history = deque(maxlen=N_history)
 
     def reset(self, x):
         self._b = np.ones_like(x)
-        self.N_count = 0
         self.guess_history.clear()
         self.error_history.clear()
+    
+    @property
+    def active(self):
+        active = self.N_count == 20
+        if not active: self.N_count += 1
+        return active
 
     def __call__(self, x, fx):
         guess_history = self.guess_history
         error_history = self.error_history
+        guess_history.append(x)
         error_history.append(fx - x)
-        if self.N_count == self.N_start:
-            try:
-                A = np.array(error_history).transpose()
-                weights = linalg.lstsq(A, A.mean() * self._b, None)[0]
-                weights /= weights.sum()
-                xs = np.array(guess_history).transpose()
-                x_guess = 0.95 * (xs @ weights) + 0.05 * fx
-            except:
-                x_guess = fx
-        else:
-            self.N_count += 1
-            x_guess = fx
-        guess_history.append(x_guess)
+        x_guess = fx
+        if self.active:
+            A = np.array(error_history)
+            A = A.transpose()
+            weights = linalg.lstsq(A, 1e-16 * self._b, None)[0]
+            weights /= weights.sum()
+            xs = np.array(guess_history).transpose()
+            x_guess = xs @ weights
         return x_guess
 
 def fake_least_squares(x, fx): return fx
