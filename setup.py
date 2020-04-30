@@ -10,7 +10,7 @@ setup(
     name='flexsolve',
     packages=['flexsolve'],
     license='MIT',
-    version='0.2.17',
+    version='0.2.18',
     description='Flexible function solvers',
     long_description=open('README.rst').read(),
     author='Yoel Cortes-Pena',

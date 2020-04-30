@@ -70,7 +70,7 @@ def fake_least_squares(x, fx): return fx
 def as_least_squares(lstsq, x):
     if lstsq: 
         if not isinstance(lstsq, LstSqIter):
-            lstsq = LstSqIter(x)
+            lstsq = LstSqIter()
     else:
         lstsq = fake_least_squares
     return lstsq
