@@ -13,6 +13,9 @@ stoichiometry = np.array([-1, 0.5, 2, 1, 0.1, 0.001, 0, 0])
 feed = np.array([20, 10, 0, 0, 0, 0, 30, 15], dtype=float)
 recycle = np.zeros_like(feed)
 
+def reset_feed():
+    feed[:] = [20, 10, 0, 0, 0, 0, 30, 15]
+
 def f(x):
     if (x < 0).any(): raise ValueError('values must be possitive')
     recycle[:] = x
@@ -32,11 +35,10 @@ def create_plot(line=False):
         plt.plot(xs, ys)
 
 p = flx.Profiler(f)
-solution = flx.fixed_point(p, feed, maxiter=100, lstsq=True)
-create_plot(True)
-p = flx.Profiler(f)
-solution = flx.aitken(p, feed, maxiter=100)
-create_plot()
-p = flx.Profiler(f)
-solution = flx.wegstein(p, feed, maxiter=100)
-create_plot()
+flx.fixed_point(p, feed, lstsq=flx.LstSqIter(3, 4))
+p.archive('fixed-point')
+flx.wegstein(p, feed)
+p.archive('Wegstein')
+flx.aitken(p, feed)
+p.archive('Aitken')
+print(p.sizes())

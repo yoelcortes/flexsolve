@@ -17,28 +17,36 @@ __all__ = ('fixed_point',
            'conditional_wegstein',
            'aitken',
            'conditional_aitken',
+           'LeastSquaresIteration',
+           'LstSqIter',
 ) 
 
 
 class LeastSquaresIteration:
-    __slots__ = ('guess_history', 'error_history', 
+    __slots__ = ('guess_history', 'error_history', 'N_activate',
                  'N_count', '_b')
-    def __init__(self, x, N_history=5):
-        self._b = np.ones_like(x)
+    def __init__(self, N_history=5, N_activate=20, b=None):
+        self._b = None
         self.N_count = 0
+        self.N_activate = N_activate
         self.guess_history = deque(maxlen=N_history)
         self.error_history = deque(maxlen=N_history)
-
-    def reset(self, x):
-        self._b = np.ones_like(x)
-        self.guess_history.clear()
-        self.error_history.clear()
     
     @property
     def active(self):
-        active = self.N_count == 20
+        active = self.N_count == self.N_activate
         if not active: self.N_count += 1
         return active
+
+    @property
+    def b(self):
+        b = self._b
+        if b is None:
+            self._b = b = 1e-16 * np.ones_like(self.guess_history[0])
+        return b
+    @b.setter
+    def b(self, b):
+        self._b = b
 
     def __call__(self, x, fx):
         guess_history = self.guess_history
@@ -49,20 +57,20 @@ class LeastSquaresIteration:
         if self.active:
             A = np.array(error_history)
             A = A.transpose()
-            weights = linalg.lstsq(A, 1e-16 * self._b, None)[0]
+            weights = linalg.lstsq(A, 1e-16 * self.b, None)[0]
             weights /= weights.sum()
             xs = np.array(guess_history).transpose()
             x_guess = xs @ weights
         return x_guess
 
+LstSqIter = LeastSquaresIteration
+
 def fake_least_squares(x, fx): return fx
 
 def as_least_squares(lstsq, x):
     if lstsq: 
-        if isinstance(lstsq, LeastSquaresIteration):
-            lstsq.reset(x)
-        else:
-            lstsq = LeastSquaresIteration(x)
+        if not isinstance(lstsq, LstSqIter):
+            lstsq = LstSqIter(x)
     else:
         lstsq = fake_least_squares
     return lstsq

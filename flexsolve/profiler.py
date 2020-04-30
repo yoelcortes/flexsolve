@@ -74,7 +74,7 @@ class Profiler:
         self.ys = []
 
     def sizes(self):
-        return {name: len(archive) for name, archive in self.archives.items()}
+        return {archive.name: len(archive) for archive in self.archives}
     
     def _plot_points(self, rxs, rys, offset, step):
         cycle = plt.rcParams['axes.prop_cycle']
