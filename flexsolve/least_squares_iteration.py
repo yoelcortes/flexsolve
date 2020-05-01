@@ -56,7 +56,8 @@ class LeastSquaresIteration:
             A = np.array(error_history, dtype=float)
             A = A.transpose()
             xs = np.array(guess_history, dtype=float).transpose()
-            return compute_weighted_average_by_least_squares(A, xs)
+            try: return compute_weighted_average_by_least_squares(A, xs)
+            except: pass
     
     def reset(self):
         self.guess_history.clear()
