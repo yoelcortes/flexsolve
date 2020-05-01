@@ -35,10 +35,10 @@ def create_plot(line=False):
         plt.plot(xs, ys)
 
 p = flx.Profiler(f)
-flx.fixed_point(p, feed, lstsq=flx.LstSqIter(3, 4))
+flx.fixed_point(p, feed, lstsq=flx.LstSqIter(3, 4), xtol=1e-8)
 p.archive('fixed-point')
-flx.wegstein(p, feed)
+flx.wegstein(p, feed, xtol=1e-8)
 p.archive('Wegstein')
-flx.aitken(p, feed)
+flx.aitken(p, feed, xtol=1e-8)
 p.archive('Aitken')
 print(p.sizes())
