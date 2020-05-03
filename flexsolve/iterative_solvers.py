@@ -28,9 +28,9 @@ def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=None):
     for iter in range(maxiter):
         if x0 is None:
             x0 = x1
-            x1 = f(x0)
+            x1 = f(x0, *args)
         else:
-            try: x1 = f(x0)
+            try: x1 = f(x0, *args)
             except InfeasibleRegion:
                 x0 = x1
                 x1 = f(x0)
@@ -55,7 +55,6 @@ def conditional_fixed_point(f, x, lstsq=None):
                 x0 = x1
                 x1, condition = f(x0)
         x0 = lstsq(x0, x1)
-    return x
 
 def wegstein(f, x, xtol=1e-8, args=(), maxiter=50):
     """Iterative Wegstein solver."""

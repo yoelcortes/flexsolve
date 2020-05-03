@@ -17,7 +17,7 @@ def reset_feed():
     feed[:] = [20, 10, 0, 0, 0, 0, 30, 15]
 
 def f(x):
-    if (x < 0).any(): raise flx.InfeasibleRegion('values must be positive')
+    if (x < 0).any(): raise flx.InfeasibleRegion('recycle')
     recycle[:] = x
     reactor_feed = recycle + feed
     effluent = reactor_feed + (reactor_feed[0] * stoichiometry * conversion)
