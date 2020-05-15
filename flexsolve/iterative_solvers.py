@@ -8,7 +8,7 @@ import numpy as np
 from .exceptions import SolverError, InfeasibleRegion
 from copy import copy
 from . import utils
-from .least_squares_iteration import as_least_squares
+from .least_squares_iteration import as_least_squares_iter
 
 __all__ = ('fixed_point',
            'conditional_fixed_point',
@@ -23,7 +23,7 @@ def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=None):
     """Iterative fixed-point solver. If `lstsq` is True, the least-squares 
     solution of a matrix of prior iterations may be partially used to
     iteratively esmitate the root."""
-    lstsq = as_least_squares(lstsq)
+    lstsq = as_least_squares_iter(lstsq)
     x0 = x1 = x
     for iter in range(maxiter):
         if x0 is None:
@@ -42,7 +42,7 @@ def conditional_fixed_point(f, x, lstsq=None):
     """Conditional iterative fixed-point solver. If `lstsq` is True, the
     least-squares solution of a matrix of prior iterations may be partially used
     to iteratively esmitate the root."""
-    lstsq = as_least_squares(lstsq)
+    lstsq = as_least_squares_iter(lstsq)
     x0 = x1 = x
     condition = True
     while condition:

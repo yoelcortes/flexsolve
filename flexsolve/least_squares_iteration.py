@@ -9,21 +9,10 @@ import numpy as np
 from numpy import linalg
 from collections import deque
 
-__all__ = ('as_least_squares',
+__all__ = ('as_least_squares_iter',
            'LeastSquaresIteration',
            'LstSqIter',
 )
-
-@utils.njitable
-def least_squares_argumets(A, xs):
-    A = A[~np.all(A == 0, axis=1)]
-    m, n = A.shape
-    if n > m:
-        i = n - m
-        A = A[:, i:n]
-        xs = xs[:, i:n]
-    b = 1e-12 * A.mean() * np.ones(m)
-    return A, xs, b
 
 @utils.njitable
 def weighted_average(xs, weights):
@@ -31,7 +20,7 @@ def weighted_average(xs, weights):
     return xs @ weights
 
 def compute_weighted_average_by_least_squares(A, xs):
-    A, xs, b = least_squares_argumets(A, xs)
+    b = 1e-12 * np.ones(A.shape[0])
     weights = linalg.lstsq(A, b, None)[0]
     return weighted_average(xs, weights)
 
@@ -56,8 +45,7 @@ class LeastSquaresIteration:
             A = np.array(error_history, dtype=float)
             A = A.transpose()
             xs = np.array(guess_history, dtype=float).transpose()
-            try: return compute_weighted_average_by_least_squares(A, xs)
-            except: pass
+            return compute_weighted_average_by_least_squares(A, xs)
     
     def reset(self):
         self.guess_history.clear()
@@ -73,12 +61,12 @@ class LeastSquaresIteration:
     
 LstSqIter = LeastSquaresIteration
 
-def fake_least_squares(x, fx): return fx
+def fake_least_squares_iter(x, fx): return fx
 
-def as_least_squares(lstsq):
+def as_least_squares_iter(lstsq):
     if lstsq: 
         if not isinstance(lstsq, LstSqIter):
             lstsq = LstSqIter()
     else:
-        lstsq = fake_least_squares
+        lstsq = fake_least_squares_iter
     return lstsq
