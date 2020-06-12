@@ -38,7 +38,7 @@ def scalar_wegstein_iter(x, dx, g1, g0):
 def array_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dxg) < 1e16)
-    x[mask] -= dxg[mask]**2/denominator[mask]
+    x[mask] -= dxg[mask]**2./denominator[mask]
     nmask = np.logical_not(mask)
     x[nmask] = gg[nmask]
     return x
@@ -47,7 +47,7 @@ def array_aitken_iter(x, gg, dxg, dgg_g):
 def scalar_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     if abs(denominator) > 1e-16 and abs(dxg) < 1e16:
-        x -= dxg**2 / denominator 
+        x -= dxg**2. / denominator 
     else:
         x = gg
     return x
@@ -72,7 +72,7 @@ def false_position_iter(x0, x1, dx, y0, y1, yval, df, xlast):
         if not_within_bounds(x, x0, x1):
             x = bisect(x0, x1)
         elif iteration_is_getting_stuck(x, xlast, dx):
-            x = (x + x0 + x1) / 3
+            x = (x + x0 + x1) / 3.
     else:
         x = bisect(x0, x1)
     return x

@@ -26,7 +26,7 @@ def njitable(f=None, **options):
     When `flexsolve.speed_up` is run, all njitable functions are compiled.
     
     """
-    if not f: return lambda f: njitable(f, replace, **options)
+    if not f: return lambda f: njitable(f, **options)
     njitables.append((f, options))
     return f
 

@@ -49,7 +49,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
-    while np.abs(dx) > xtol:
+    while abs(dx) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -74,7 +74,7 @@ def bisection(f, x0, x1, y0=None, y1=None, yval=0., xtol=1e-6, ytol=1e-6, args=(
     dx = x1 - x0
     bisect = utils.bisect
     x = bisect(x0, x1)
-    while np.abs(dx) > xtol:
+    while abs(dx) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -97,7 +97,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df0, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
-    while np.abs(dx) > xtol:
+    while abs(dx) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             y2 = y1
@@ -142,7 +142,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
     x = g0 = x0 + df*dx1x0/(y1-y0)
     wegstein_iter = utils.scalar_wegstein_iter
     not_within_bounds = utils.not_within_bounds
-    while np.abs(dx1x0) > xtol:
+    while abs(dx1x0) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -176,7 +176,7 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     aitken_iter = utils.scalar_aitken_iter
     bisect = utils.bisect
     not_within_bounds = utils.not_within_bounds
-    while np.abs(dx1) > xtol:
+    while abs(dx1) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -189,7 +189,7 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
             return x
         dx0 = x1-x0
         g = x0 + df*dx0/(y1-y0)
-        if np.abs(dx0) < xtol:
+        if abs(dx0) < xtol:
             return g
         y = f(g, *args)
         if y > yval_ub:

@@ -11,7 +11,9 @@ __all__ = ('InfeasibleRegion',
 
 class InfeasibleRegion(RuntimeError):
     """Runtime error regarding infeasible processes."""
-    def __init__(self, process): super().__init__(process + ' is infeasible')
+    def __init__(self, region): 
+        self.region = region
+        super().__init__(region + ' is infeasible')
 
 class ConvergenceError(RuntimeError):
     """RuntimeError regarding convergence problems."""
