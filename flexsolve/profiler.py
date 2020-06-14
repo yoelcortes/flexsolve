@@ -88,7 +88,9 @@ class Profiler:
             plt.plot(rxs, rys + offset, color=color, alpha=0.85)
             offset -= step
 
-    def plot(self, title=None, args=(), markbounds=True):
+    def plot(self, title=None, args=(), markbounds=True,
+             plot_outside_bounds=True, N=50, shade=True,
+             remove_ticks=True):
         plt.figure()
         archives = self.archives
         archives.sort(key=lambda x: x.size)
@@ -96,9 +98,8 @@ class Profiler:
         x_maxs = np.array([i.x_max for i in archives])
         x_min = x_mins.min()
         x_max = x_maxs.max()
-        
-        dx = (x_max - x_min) / 50
-        xs = np.linspace(x_min - dx, x_max + dx)
+        dx = (x_max - x_min) / 50 if plot_outside_bounds else 0.
+        xs = np.linspace(x_min - dx, x_max + dx, N)
         f = lambda x: self.f(x, *args)
         ys = np.array([f(x) for x in xs])
         y_min = ys.min()
@@ -109,8 +110,9 @@ class Profiler:
         step = 2 * offset / N
         offset -= step / 2
         self._plot_points(xs, ys, offset, step)
-        plt.fill_between(xs, ys - offset - step, ys + offset + step,
-                         color='grey', alpha=0.1)
+        if shade:
+            plt.fill_between(xs, ys - offset - step, ys + offset + step,
+                             color='grey', alpha=0.1)
 
         x_solution = np.mean([i.xs[-1] for i in archives])        
         y_solution = f(x_solution)
@@ -148,8 +150,9 @@ class Profiler:
         if title: plt.title(title)
         plt.ylim([y_lb, y_ub])
         plt.xlim([xs[0], xs[-1]])
-        plt.tick_params(axis='both', which='both', length=0)
-        plt.yticks([])
+        if remove_ticks:
+            plt.tick_params(axis='both', which='both', length=0)
+            plt.yticks([])
         plt.legend()
         
     

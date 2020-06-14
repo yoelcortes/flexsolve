@@ -14,7 +14,7 @@ def pick_best_solution(fargs):
     f_best = np.inf
     args_best = None
     abs_ = abs
-    for f, args  in fargs:
+    for f, args in fargs:
         fa = abs_(f)
         if fa < f_best:
             f_best = fa
