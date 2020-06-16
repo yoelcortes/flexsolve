@@ -44,12 +44,21 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
     dx = x1 - x0
     df = yval - y0
+    abs_ = abs
+    err0 = abs_(df)
+    err1 = abs_(yval - y1)
+    if err0 < err1:
+        x_best = x0
+        err_best = err0
+    else:
+        x_best = x1
+        err_best = err1
     false_position_iter = utils.false_position_iter
     if x is None or utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
-    while abs(dx) > xtol:
+    while abs_(dx) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -58,10 +67,15 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
             x0 = x
             y0 = y
             df = yval - y0
-        else: break
+        else: return x
         dx = x1 - x0
         x = false_position_iter(x0, x1, dx, y0, y1, yval, df, x)
-    return x
+        err = abs_(yval - y)
+        if err < err_best:
+            err_best = err
+            x_best = x
+    if x_best != x: f(x_best, *args)
+    return x_best
 
 @njit_alternative
 def bisection(f, x0, x1, y0=None, y1=None, yval=0., xtol=1e-6, ytol=1e-6, args=()):
@@ -72,18 +86,32 @@ def bisection(f, x0, x1, y0=None, y1=None, yval=0., xtol=1e-6, ytol=1e-6, args=(
     yval_ub = yval + ytol
     yval_lb = yval - ytol
     dx = x1 - x0
+    abs_ = abs
+    err0 = abs_(yval - y0)
+    err1 = abs_(yval - y1)
+    if err0 < err1:
+        x_best = x0
+        err_best = err0
+    else:
+        x_best = x1
+        err_best = err1
     bisect = utils.bisect
     x = bisect(x0, x1)
-    while abs(dx) > xtol:
+    while abs_(dx) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
         elif y < yval_lb:
             x0 = x
-        else: break
+        else: return x
         dx = x1 - x0
         x = bisect(x0, x1)
-    return x
+        err = abs_(yval - y)
+        if err < err_best:
+            err_best = err
+            x_best = x
+    if x_best != x: f(x_best, *args)
+    return x_best
 
 @njit_alternative
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
@@ -97,7 +125,16 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df0, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
-    while abs(dx) > xtol:
+    abs_ = abs
+    err0 = abs_(df0)
+    err1 = abs_(yval - y1)
+    if err0 < err1:
+        x_best = x0
+        err_best = err0
+    else:
+        x_best = x1
+        err_best = err1
+    while abs_(dx) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             y2 = y1
@@ -110,10 +147,15 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
             x0 = x
             y0 = y
             df0 = yval - y
-        else: break
+        else: return x
         dx = x1 - x0
         x = utils.IQ_iter(y0, y1, y2, yval, x0, x1, x2, dx, df0, x)
-    return x
+        err = abs_(yval - y)
+        if err < err_best:
+            err_best = err
+            x_best = x
+    if x_best != x: f(x_best, *args)
+    return x_best
 
 @njit_alternative
 def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
@@ -122,7 +164,16 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
     if y1 is None: y1 = f(x1, *args)
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
     dx = x1 - x0
-    df = yval-y0
+    df = yval - y0
+    abs_ = abs
+    err0 = abs_(df)
+    err1 = abs_(yval - y1)
+    if err0 < err1:
+        x_best = x0
+        err_best = err0
+    else:
+        x_best = x1
+        err_best = err1
     if x is None or utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     xlast = x
@@ -142,7 +193,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
     x = g0 = x0 + df*dx1x0/(y1-y0)
     wegstein_iter = utils.scalar_wegstein_iter
     not_within_bounds = utils.not_within_bounds
-    while abs(dx1x0) > xtol:
+    while abs_(dx1x0) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -151,7 +202,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
             x0 = x
             y0 = y
             df = yval - y
-        else: break
+        else: return x
         dx1x0 = x1-x0
         g1 = x0 + df*dx1x0/(y1-y0)
         dx = x - xlast
@@ -159,6 +210,12 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
         x = wegstein_iter(x, dx, g1, g0)
         if not_within_bounds(x, x0, x1): x = g0 = g1
         g1 = g0
+        err = abs_(yval - y)
+        if err < err_best:
+            err_best = err
+            x_best = x
+    if x_best != x: f(x_best, *args)
+    f(x_best, *args)
     return x
 
 @njit_alternative
@@ -167,8 +224,17 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
-    dx1 = x1-x0
-    df = yval-y0
+    dx1 = x1 - x0
+    df = yval - y0
+    abs_ = abs
+    err0 = abs_(df)
+    err1 = abs_(yval - y1)
+    if err0 < err1:
+        x_best = x0
+        err_best = err0
+    else:
+        x_best = x1
+        err_best = err1
     if x is None or utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx1, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
@@ -176,7 +242,7 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     aitken_iter = utils.scalar_aitken_iter
     bisect = utils.bisect
     not_within_bounds = utils.not_within_bounds
-    while abs(dx1) > xtol:
+    while abs_(dx1) > xtol:
         y = f(x, *args)
         if y > yval_ub:
             x1 = x
@@ -187,9 +253,13 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
             df = yval-y
         else: 
             return x
+        err = abs_(yval - y)
+        if err < err_best:
+            err_best = err
+            x_best = x
         dx0 = x1-x0
         g = x0 + df*dx0/(y1-y0)
-        if abs(dx0) < xtol:
+        if abs_(dx0) < xtol:
             return g
         y = f(g, *args)
         if y > yval_ub:
@@ -206,5 +276,10 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
         dxg = x - g
         x = aitken_iter(x, gg, dxg, gg - g)
         if not_within_bounds(x, x0, x1): x = bisect(x0, x1)
-    return x
+        err = abs_(yval - y)
+        if err < err_best:
+            err_best = err
+            x_best = x
+    if x_best != x: f(x_best, *args)
+    return x_best
 

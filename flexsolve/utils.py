@@ -10,16 +10,17 @@ import numpy as np
 
 np.seterr(divide='raise', invalid='raise')
 
-def pick_best_solution(fargs):
-    f_best = np.inf
-    args_best = None
+@njitable
+def pick_best_solution(xys):
+    y_best = 1e16
+    x_best = 0.
     abs_ = abs
-    for f, args in fargs:
-        fa = abs_(f)
-        if fa < f_best:
-            f_best = fa
-            args_best = args
-    return args_best
+    for x, y in xys:
+        y = abs_(y)
+        if y < y_best:
+            y_best = y
+            x_best = x
+    return x_best
 
 def get_wegstein_iter_function(x):
     return array_wegstein_iter if isinstance(x, Iterable) else scalar_wegstein_iter
