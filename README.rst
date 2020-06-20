@@ -34,7 +34,7 @@ Documentation
 
 Flexsolve solvers can solve a variety of specifications:
 
-* Solve x where f(x) = x:
+* Solve x where f(x) = x (iterative):
 
   * **fixed_point**: Simple fixed point iteration.
 
@@ -42,7 +42,7 @@ Flexsolve solvers can solve a variety of specifications:
 
   * **aitken**: Aitken-Steffensen accelerated iteration method.
 
-* Solve x where f(x) = 0 and x0 < x < x1:
+* Solve x where f(x) = 0 and x0 < x < x1 (bounded):
 
   * **bisection**: Simple bisection method
 
@@ -54,7 +54,7 @@ Flexsolve solvers can solve a variety of specifications:
 
   * **bounded_aitken**: False position method with Aitken-Steffensen acceleration.
 
-* Solve x where f(x) = 0:
+* Solve x where f(x) = 0 (open):
 
   * **secant**: Simple secant method.
 
@@ -66,7 +66,9 @@ Parameters for each solver are pretty consitent and straight forward:
 
 * **f**: objective function in the form of `f(x, *args)`.
 * **x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
-* **x0, x1**: Root bracket. Solution must lie within `x0` and `x1`.
+* **x0, x1**: 
+  * Bounded solvers: Root bracket. Solution must lie within `x0` and `x1`.
+  * Open solvers: Initial and second guess. Second guess, 'x1', is optional.
 * **xtol=1e-8**: Solver stops when the root lies within `xtol`.
 * **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
 * **yval=0**: Root offset. Solver will find x where f(x) = `yval`.
@@ -166,12 +168,35 @@ with and without compiling:
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
     11.3 µs ± 156 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
     
+It is also possible to use compiled flexsolve solvers as part of jit-compiled 
+code:
+
+.. code-block:: python
+
+    >>> from numba import njit
+    >>> import flexsolve as flx
+    >>> flx.speed_up() # Not necessary if previous example was run
+    >>> f = njit(lambda x: x**3 - 40 + 2*x) # Must be jit compiled to run in other compiled code
+    >>> # For demonstration purposes, the high level compiled function is a silly one liner
+    >>> solve_x = njit(lambda: flx.IQ_interpolation(f, -5., 5.))
+    >>> x = solve_x() # First run is slow because it needs to compile
+    >>> %timeit solve_x()
+    1.07 µs ± 40.5 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+    
 The iterative methods for solving f(x) = x (e.g. fixed-point, Wegstain, Aitken) are 
 capable of solving multi-dimensional problems. Simply make sure x is an array 
 and f(x) returns an array with the same dimensions. In fact, the
 `The Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
 uses flexsolve to solve many chemical engineering problems, including 
-process recycle stream flow rates and vapor-liquid equilibrium compositions.
+process recycle stream flow rates and vapor-liquid equili
+
+Warning
+-------
+Solvers in flexsolve do not garantee a good solution. Once the solver reaches
+the given maximum number of iterations, `maxiter` or the absolute tolerance
+in x, `xtol`, the solver returns the last solution without the need to 
+satisty the tolerane in f(x), `ytol`. It is entirely up to the user to check
+if the given value is an appropriate solution.
 
 Bug reports
 -----------

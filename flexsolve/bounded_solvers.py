@@ -39,12 +39,13 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, yval=0, args=(), maxiter=50):
 @njit_alternative
 def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """False position solver."""
+    abs_ = abs
+    if x is None: x = abs_(x0) + abs_(x1)
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
     dx = x1 - x0
     df = yval - y0
-    abs_ = abs
     err0 = abs_(df)
     err1 = abs_(yval - y1)
     if err0 < err1:
@@ -54,7 +55,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
         x_best = x1
         err_best = err1
     false_position_iter = utils.false_position_iter
-    if x is None or utils.not_within_bounds(x, x0, x1):
+    if utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
@@ -116,16 +117,17 @@ def bisection(f, x0, x1, y0=None, y1=None, yval=0., xtol=1e-6, ytol=1e-6, args=(
 @njit_alternative
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """Inverse quadratic interpolation solver."""
+    abs_ = abs
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
+    if x is None: x = abs_(x0) + abs_(x1)
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
     df0 = yval - y0
     dx = x1 - x0
-    if x is None or utils.not_within_bounds(x, x0, x1):
+    if utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df0, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol
-    abs_ = abs
     err0 = abs_(df0)
     err1 = abs_(yval - y1)
     if err0 < err1:
@@ -160,12 +162,13 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
 @njit_alternative
 def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """False position solver with Wegstein acceleration."""
+    abs_ = abs
+    if x is None: x = abs_(x0) + abs_(x1)
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
     dx = x1 - x0
     df = yval - y0
-    abs_ = abs
     err0 = abs_(df)
     err1 = abs_(yval - y1)
     if err0 < err1:
@@ -174,7 +177,7 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
     else:
         x_best = x1
         err_best = err1
-    if x is None or utils.not_within_bounds(x, x0, x1):
+    if utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx, y0, y1, yval, df, x0)
     xlast = x
     y = f(x, *args)
@@ -221,12 +224,13 @@ def bounded_wegstein(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, yt
 @njit_alternative
 def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol=5e-8, args=()):
     """False position solver with Aitken acceleration."""
+    abs_ = abs
+    if x is None: x = abs_(x0) + abs_(x1)
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
     if y1 < yval:  x1, y1, x0, y0 = x0, y0, x1, y1
     dx1 = x1 - x0
     df = yval - y0
-    abs_ = abs
     err0 = abs_(df)
     err1 = abs_(yval - y1)
     if err0 < err1:
@@ -235,7 +239,7 @@ def bounded_aitken(f, x0, x1, y0=None, y1=None, x=None, yval=0., xtol=1e-8, ytol
     else:
         x_best = x1
         err_best = err1
-    if x is None or utils.not_within_bounds(x, x0, x1):
+    if utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx1, y0, y1, yval, df, x0)
     yval_ub = yval + ytol
     yval_lb = yval - ytol

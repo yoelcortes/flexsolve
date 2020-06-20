@@ -4,12 +4,13 @@ Created on Tue Nov 19 22:50:26 2019
 
 @author: yoelr
 """
-from .exceptions import SolverError
 import numpy as np
-from . import utils
+from flexsolve.jit_speed import njit_alternative
+from flexsolve import utils
 
 __all__ = ('secant', 'wegstein_secant', 'aitken_secant')
 
+@njit_alternative
 def secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     """Secant solver."""
     if x1 is None: x1 = x0 + xtol
@@ -23,8 +24,9 @@ def secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
         if np.abs(dx) < xtol or np.abs(y1) < ytol: return x1
         x0 = x1
         y0 = y1
-    raise SolverError(maxiter, x1)
-    
+    return x1
+
+@njit_alternative    
 def wegstein_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Wegstein acceleration."""
     if x1 is None: x1 = x0 + xtol
@@ -46,8 +48,9 @@ def wegstein_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
         if np.abs(dx) < xtol or np.abs(y1) < ytol: return x1
         y0 = y1
         g0 = g1
-    raise SolverError(maxiter, x1)
-    
+    return x1
+
+@njit_alternative
 def aitken_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     """Secant solver with Aitken acceleration."""
     if x1 is None: x1 = x0 + xtol
@@ -70,4 +73,4 @@ def aitken_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
         x1 = aitken_iter(x1, x2, dx, x2 - x0)
         dx = x1 - x0
         y0 = y1
-    raise SolverError(maxiter, x2)
+    return x1

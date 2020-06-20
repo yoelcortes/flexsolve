@@ -6,6 +6,7 @@ Created on Sun Apr 19 17:12:04 2020
 """
 import flexsolve as flx 
 from scipy import optimize as opt
+import numpy as np
 
 # %% Profile solvers
 

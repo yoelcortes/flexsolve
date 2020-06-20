@@ -4,8 +4,10 @@ Created on Mon Apr 20 16:41:04 2020
 
 @author: yoelr
 """
-from .jit_speed import njitable
+from flexsolve.jit_speed import njitable
+from numba.extending import overload, register_jitable
 from collections.abc import Iterable
+from numba import types
 import numpy as np
 
 np.seterr(divide='raise', invalid='raise')
@@ -22,13 +24,33 @@ def pick_best_solution(xys):
             x_best = x
     return x_best
 
-def get_wegstein_iter_function(x):
-    return array_wegstein_iter if isinstance(x, Iterable) else scalar_wegstein_iter
+def wegstein_iter(x, dx, g1, g0):
+    if isinstance(x, Iterable):
+        return array_wegstein_iter(x, dx, g1, g0)
+    else:
+        return scalar_wegstein_iter(x, dx, g1, g0)
 
-def get_aitken_iter_function(x):
-    return array_aitken_iter if isinstance(x, Iterable) else scalar_aitken_iter
+def aitken_iter(x, gg, dxg, dgg_g):
+    if isinstance(x, Iterable):
+        return array_aitken_iter(x, gg, dxg, dgg_g)
+    else:
+        return scalar_aitken_iter(x, gg, dxg, dgg_g)
 
-@njitable
+@overload(wegstein_iter)
+def jit_wegstein_iter(x, dx, g1, g0):
+    if isinstance(x, types.Array) and x.ndim:
+        return array_wegstein_iter  
+    else:
+        return scalar_wegstein_iter
+
+@overload(aitken_iter)
+def jit_aitken_iter(x, gg, dxg, dgg_g):
+    if isinstance(x, types.Array) and x.ndim:
+        return array_aitken_iter
+    else:
+        return scalar_aitken_iter
+
+@register_jitable
 def array_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
     mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dx) < 1e16)
@@ -36,7 +58,7 @@ def array_wegstein_iter(x, dx, g1, g0):
     w[mask] = dx[mask]/denominator[mask]
     return w*g1 + (1.-w)*x
 
-@njitable
+@register_jitable
 def scalar_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
     if abs(denominator) > 1e-16 and abs(dx) < 1e16:
@@ -46,16 +68,17 @@ def scalar_wegstein_iter(x, dx, g1, g0):
         x = g1
     return x
         
-@njitable
+@register_jitable
 def array_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dxg) < 1e16)
+    x = x.copy()
     x[mask] -= dxg[mask]**2./denominator[mask]
     nmask = np.logical_not(mask)
     x[nmask] = gg[nmask]
     return x
 
-@njitable
+@register_jitable
 def scalar_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     if abs(denominator) > 1e-16 and abs(dxg) < 1e16:

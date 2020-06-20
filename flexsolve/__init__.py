@@ -9,7 +9,6 @@ from . import open_solvers
 from . import bounded_solvers
 from . import iterative_solvers
 from . import least_squares_iteration
-from . import exceptions
 from . import profiler
 from . import utils
 from . import fast
@@ -18,7 +17,6 @@ __all__ = (*open_solvers.__all__,
            *bounded_solvers.__all__,
            *iterative_solvers.__all__,
            *least_squares_iteration.__all__,
-           *exceptions.__all__,
            *profiler.__all__,
            *jit_speed.__all__,
            'utils',
@@ -30,5 +28,4 @@ from .open_solvers import *
 from .bounded_solvers import *
 from .iterative_solvers import *
 from .least_squares_iteration import *
-from .exceptions import *
 from .profiler import *

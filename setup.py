@@ -10,11 +10,11 @@ setup(
     name='flexsolve',
     packages=['flexsolve'],
     license='MIT',
-    version='0.3.8',
+    version='0.3.9',
     description='Flexible function solvers',
     long_description=open('README.rst').read(),
     author='Yoel Cortes-Pena',
-    install_requires=['numba>=0.48.0', 'llvmlite>=0.31', 'numpy'],
+    install_requires=['numba>=0.50.0', 'llvmlite>=0.31', 'numpy'],
     python_requires=">=3.6",
     package_data=
         {'flexsolve': []},
