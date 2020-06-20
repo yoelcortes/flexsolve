@@ -59,7 +59,6 @@ def speed_up():
     --------
     njitable
     njit_alternative
-    overloadable
     
     """
     setfield = setattr

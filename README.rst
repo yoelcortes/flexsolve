@@ -65,13 +65,21 @@ Flexsolve solvers can solve a variety of specifications:
 Parameters for each solver are pretty consitent and straight forward:
 
 * **f**: objective function in the form of `f(x, *args)`.
+
 * **x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
+
 * **x0, x1**: 
+
   * Bounded solvers: Root bracket. Solution must lie within `x0` and `x1`.
+  
   * Open solvers: Initial and second guess. Second guess, 'x1', is optional.
+  
 * **xtol=1e-8**: Solver stops when the root lies within `xtol`.
+
 * **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
+
 * **yval=0**: Root offset. Solver will find x where f(x) = `yval`.
+
 * **args=()**: Arguments to pass to `f`.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
@@ -160,13 +168,13 @@ with and without compiling:
     >>> f = lambda x: x**3 - 40 + 2*x 
     >>> # Time solver without compiling
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
-    38.3 µs ± 4.7 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+    30.2 µs ± 139 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
     >>> flx.speed_up() # This is the only line we need to run to speed up flexsolve
     >>> # First run is slower because it need to compile
     >>> x = flx.IQ_interpolation(f, -5, 5) 
     >>> # Time solver after compiling
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
-    11.3 µs ± 156 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+    9.34 µs ± 45.6 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
     
 It is also possible to use compiled flexsolve solvers as part of jit-compiled 
 code:
