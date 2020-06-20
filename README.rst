@@ -228,7 +228,7 @@ any changes you make back, and benefit the community.
 Citation
 --------
 
-To cite eqsolvers in publications use:
+To cite flexsolve in publications use:
 
     Yoel Cortes-Pena (2019). flexsolve: Flexible function solvers.
     https://github.com/yoelcortes/flexsolve
