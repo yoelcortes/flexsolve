@@ -5,7 +5,7 @@ Created on Tue Apr  7 09:25:27 2020
 @author: yoelr
 """
 from numba import njit
-from numba.extending import overload, register_jitable
+from numba.extending import register_jitable
 from . import fast
 import sys
 
@@ -28,7 +28,7 @@ def njitable(f=None, **options):
     
     """
     if not f: return lambda f: njitable(f, **options)
-    f_jitable = register_jitable(f, **options)
+    f_jitable = register_jitable(**options)(f) if options else register_jitable(f)
     njitables.append((f, options))
     return f_jitable
 
@@ -45,7 +45,7 @@ def njit_alternative(f=None, **options):
     
     """
     if not f: return lambda f: njitable(f, **options)
-    f_jitable = register_jitable(f, **options)
+    f_jitable = register_jitable(**options)(f) if options else register_jitable(f)
     njit_alternatives.append((f, options))
     setattr(fast, f.__name__, f_jitable)
     return f_jitable
