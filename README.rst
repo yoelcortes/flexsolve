@@ -80,9 +80,9 @@ Parameters for each solver are pretty consitent and straight forward:
 
 * **args=()**: Arguments to pass to `f`.
 
-* **maxiter**: Maximum number of iterations.
+* **maxiter=50**: Maximum number of iterations.
 
-* **checkroot**: Whether to raise a RuntimeError when root tolerance is not satisfied.
+* **checkroot=True**: Whether to raise a RuntimeError when root tolerance is not satisfied.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
 different solvers. In the graphs, the points are the solver iterations and 
