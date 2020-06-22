@@ -74,8 +74,7 @@ Parameters for each solver are pretty consitent and straight forward:
   
 * **xtol=1e-8**: Solver stops when the root lies within `xtol`.
 
-* **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root. Iterative solvers (which solve functions of the form f(x) = x) do not accept
-a `ytol` argument as xtol and ytol are actually mathematically equivalent.
+* **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root. Iterative solvers (which solve functions of the form f(x) = x) do not accept a `ytol` argument as xtol and ytol are actually mathematically equivalent.
 
 * **args=()**: Arguments to pass to `f`.
 
