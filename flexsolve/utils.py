@@ -100,7 +100,7 @@ def bisect(x0, x1):
     return (x0 + x1) / 2.0
 
 @njitable(cache=True)
-def false_position_iter(x0, x1, dx, y0, y1, yval, df, xlast):
+def false_position_iter(x0, x1, dx, y0, y1, df, xlast):
     dy = y1 - y0
     if dy:
         x = x0 + df*dx/dy
@@ -113,14 +113,13 @@ def false_position_iter(x0, x1, dx, y0, y1, yval, df, xlast):
     return x
 
 @njitable(cache=True)
-def IQ_iter(y0, y1, y2, yval, x0, x1, x2, dx, df0, xlast):
-    df1 = yval - y1
-    df2 = yval - y2
+def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
+    df1 = -y1
+    df2 = -y2
     d01 = df0-df1
     d02 = df0-df2
     d12 = df1-df2
-    ds = np.array([d01, d02, d12])
-    if (np.abs(ds) > 1e-16).all():
+    if abs(d01) > 1e-16 and abs(d02) > 1e-16 and abs(d12) > 1e-16:
         df0_d12 = df0 / d12
         df1_d02 = df1 / d02
         df2_d01 = df2 / d01
@@ -128,5 +127,5 @@ def IQ_iter(y0, y1, y2, yval, x0, x1, x2, dx, df0, xlast):
         if not_within_bounds(x, x0, x1):
             x = bisect(x0, x1)
     else:
-        x = false_position_iter(x0, x1, dx, y0, y1, yval, df0, xlast)
+        x = false_position_iter(x0, x1, dx, y0, y1, df0, xlast)
     return x

@@ -7,7 +7,6 @@ Created on Tue Apr 28 16:56:59 2020
 import numpy as np
 from flexsolve.jit_speed import njit_alternative
 from flexsolve.least_squares_iteration import as_least_squares_iter
-from copy import copy
 from . import utils
 
 

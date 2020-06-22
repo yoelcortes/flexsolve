@@ -78,8 +78,6 @@ Parameters for each solver are pretty consitent and straight forward:
 
 * **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
 
-* **yval=0**: Root offset. Solver will find x where f(x) = `yval`.
-
 * **args=()**: Arguments to pass to `f`.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
@@ -168,13 +166,13 @@ with and without compiling:
     >>> f = lambda x: x**3 - 40 + 2*x 
     >>> # Time solver without compiling
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
-    30.2 µs ± 139 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+    9.81 µs ± 131 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
     >>> flx.speed_up() # This is the only line we need to run to speed up flexsolve
     >>> # First run is slower because it need to compile
     >>> x = flx.IQ_interpolation(f, -5, 5) 
     >>> # Time solver after compiling
     >>> %timeit flx.IQ_interpolation(f, -5, 5)
-    9.34 µs ± 45.6 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+    7.01 µs ± 88.4 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
     
 It is also possible to use compiled flexsolve solvers as part of jit-compiled 
 code:
@@ -189,7 +187,7 @@ code:
     >>> solve_x = njit(lambda: flx.IQ_interpolation(f, -5., 5.))
     >>> x = solve_x() # First run is slow because it needs to compile
     >>> %timeit solve_x()
-    1.07 µs ± 40.5 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+    139 ns ± 2.08 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)
     
 The iterative methods for solving f(x) = x (e.g. fixed-point, Wegstain, Aitken) are 
 capable of solving multi-dimensional problems. Simply make sure x is an array 
