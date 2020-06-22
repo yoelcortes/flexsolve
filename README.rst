@@ -74,7 +74,7 @@ Parameters for each solver are pretty consitent and straight forward:
   
 * **xtol=1e-8**: Solver stops when the root lies within `xtol`.
 
-* **ytol=5e-8**: Stop when the f(x) lies within `ytol` of the root.
+* **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
 
 * **args=()**: Arguments to pass to `f`.
 
