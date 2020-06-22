@@ -10,6 +10,12 @@ from collections.abc import Iterable
 from numba import types
 import numpy as np
 
+__all__ = ('pick_best_solution', 'wegstein_iter',
+           'aitken_iter', 'array_wegstein_iter', 'scalar_wegstein_iter',
+           'array_aitken_iter', 'scalar_aitken_iter', 'not_within_bounds',
+           'iteration_is_getting_stuck', 'bisect', 'false_position_iter',
+           'IQ_iter')
+
 np.seterr(divide='raise', invalid='raise')
 
 @njitable(cache=True)
@@ -123,9 +129,14 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
         df0_d12 = df0 / d12
         df1_d02 = df1 / d02
         df2_d01 = df2 / d01
-        x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02
+        x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02    
         if not_within_bounds(x, x0, x1):
             x = bisect(x0, x1)
     else:
         x = false_position_iter(x0, x1, dx, y0, y1, df0, xlast)
     return x
+
+@njitable(cache=True)
+def raise_root_error(not_satisfied):
+    if not_satisfied:
+        raise RuntimeError('root could not be solved within error tolerance')

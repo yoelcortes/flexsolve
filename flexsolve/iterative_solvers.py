@@ -19,7 +19,8 @@ __all__ = ('fixed_point',
            'fixed_point_lstsq',
 ) 
 
-def fixed_point_lstsq(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=True):
+def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
+                      checkroot=True):
     """The least-squares solution of a matrix of prior iterations is partially
     used to iteratively esmitate the root."""
     lstsq = as_least_squares_iter(lstsq)
@@ -35,16 +36,18 @@ def fixed_point_lstsq(f, x, xtol=1e-8, args=(), maxiter=50, lstsq=True):
                 x1 = f(x0)
         if (np.abs(x1 - x0) < xtol).all(): return x1
         x0 = lstsq(x0, x1)
+    utils.raise_root_error(checkroot)
     return x1
 
 @njit_alternative
-def fixed_point(f, x, xtol=1e-8, args=(), maxiter=50):
+def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
     """Iterative fixed-point solver."""
     x0 = x1 = x
     for iter in range(maxiter):
         x1 = f(x0, *args)
         if (np.abs(x1 - x0) < xtol).all(): return x1
         x0 = x1
+    utils.raise_root_error(checkroot)
     return x1
 
 @njit_alternative
@@ -57,7 +60,7 @@ def conditional_fixed_point(f, x):
         x0 = x1
 
 @njit_alternative
-def wegstein(f, x, xtol=1e-8, args=(), maxiter=50):
+def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
     """Iterative Wegstein solver."""
     x0 = x
     x1 = g0 = f(x0, *args)
@@ -72,7 +75,8 @@ def wegstein(f, x, xtol=1e-8, args=(), maxiter=50):
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
-    return x1
+    utils.raise_root_error(checkroot)
+    return g1
 
 @njit_alternative
 def conditional_wegstein(f, x):
@@ -93,7 +97,7 @@ def conditional_wegstein(f, x):
         g0 = g1
 
 @njit_alternative
-def aitken(f, x, xtol=1e-8, args=(), maxiter=50):
+def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
     """Iterative Aitken solver."""
     gg = x
     aitken_iter = utils.aitken_iter
@@ -108,7 +112,8 @@ def aitken(f, x, xtol=1e-8, args=(), maxiter=50):
         dgg_g = gg - g
         if (np.abs(dgg_g) < xtol).all(): return gg
         x = aitken_iter(x, gg, dxg, dgg_g)
-    return x
+    utils.raise_root_error(checkroot)
+    return gg
 
 @njit_alternative
 def conditional_aitken(f, x):

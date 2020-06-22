@@ -50,10 +50,6 @@ Flexsolve solvers can solve a variety of specifications:
 
   * **IQ_interpolation**: Quadratic interpolation solver (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
 
-  * **bounded_wegstein**: False position method with Wegstein acceleration.
-
-  * **bounded_aitken**: False position method with Aitken-Steffensen acceleration.
-
 * Solve x where f(x) = 0 (open):
 
   * **secant**: Simple secant method.
@@ -66,7 +62,9 @@ Parameters for each solver are pretty consitent and straight forward:
 
 * **f**: objective function in the form of `f(x, *args)`.
 
-* **x**: Root guess. Solver begins the iteration by evaluating `f(x)`.
+* **x**: 
+  
+  * Iterative solvers: Root guess. Solver begins the iteration by evaluating `f(x)`.
 
 * **x0, x1**: 
 
@@ -76,9 +74,15 @@ Parameters for each solver are pretty consitent and straight forward:
   
 * **xtol=1e-8**: Solver stops when the root lies within `xtol`.
 
-* **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root.
+* **ytol=5e-8**:
+  
+  * Bounded or open solvers: Stop when the f(x) lies within `ytol` of the root.
 
 * **args=()**: Arguments to pass to `f`.
+
+* **maxiter**: Maximum number of iterations.
+
+* **checkroot**: Whether to raise a RuntimeError when root tolerance is not satisfied.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
 different solvers. In the graphs, the points are the solver iterations and 
@@ -102,12 +106,6 @@ help us relate the points to the curve (not an actual interval):
     >>> flx.IQ_interpolation(p, x0, x1)
     3.225240462796626
     >>> p.archive('IQ-interpolation')
-    >>> flx.bounded_wegstein(p, x0, x1)
-    3.225240462790051
-    >>> p.archive('Wegstein')
-    >>> x_aitken = flx.bounded_aitken(p, x0, x1)
-    3.2252404627883218
-    >>> p.archive('Aitken')
     >>> flx.false_position(p, x0, x1)
     3.225240462687035
     >>> p.archive('False position')
@@ -195,14 +193,6 @@ and f(x) returns an array with the same dimensions. In fact, the
 `The Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
 uses flexsolve to solve many chemical engineering problems, including 
 process recycle stream flow rates and vapor-liquid equili
-
-Warning
--------
-Solvers in flexsolve do not garantee a good solution. Once the solver reaches
-the given maximum number of iterations, `maxiter`, or the absolute tolerance
-in x, `xtol`, the solver returns the last solution without the need to 
-satisty the tolerance in f(x), `ytol`. It is entirely up to the user to check
-if the given value is an appropriate solution.
 
 Bug reports
 -----------

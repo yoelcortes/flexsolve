@@ -4,14 +4,14 @@ Created on Tue Nov 19 22:50:26 2019
 
 @author: yoelr
 """
-import numpy as np
 from flexsolve.jit_speed import njit_alternative
 from flexsolve import utils
 
 __all__ = ('secant', 'wegstein_secant', 'aitken_secant')
 
 @njit_alternative
-def secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
+def secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
+           checkroot=True):
     """Secant solver."""
     if x1 is None: x1 = x0 + xtol
     y0 = f(x0, *args)
@@ -20,15 +20,19 @@ def secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     dx = x1-x0 
     for iter in range(maxiter): 
         y1 = f(x1, *args)
+        if abs_(y1) < ytol: return x1
+        if y1 == y0 or abs_(dx) < xtol: break 
         x1 = x0 - y1*dx/(y1-y0)
         dx = x1-x0 
-        if abs_(dx) < xtol or abs_(y1) < ytol: return x1
         x0 = x1
         y0 = y1
+    utils.raise_root_error(checkroot)
     return x1
 
+
 @njit_alternative    
-def wegstein_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
+def wegstein_secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
+                    checkroot=True):
     """Secant solver with Wegstein acceleration."""
     if x1 is None: x1 = x0 + xtol
     y0 = f(x0, *args)
@@ -43,17 +47,20 @@ def wegstein_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     wegstein_iter = utils.scalar_wegstein_iter
     for iter in range(maxiter):
         y1 = f(x1, *args)
+        if abs_(y1) < ytol: return x1
+        if abs_(dx) < xtol: break
         g1 = x1 - y1*dx/(y1-y0)
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
         dx = x1-x0
-        if abs_(dx) < xtol or abs_(y1) < ytol: return x1
         y0 = y1
         g0 = g1
+    utils.raise_root_error(checkroot)
     return x1
 
 @njit_alternative
-def aitken_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
+def aitken_secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
+                  checkroot=True):
     """Secant solver with Aitken acceleration."""
     if x1 is None: x1 = x0 + xtol
     abs_ = abs
@@ -63,17 +70,18 @@ def aitken_secant(f, x0, x1=None, xtol=1e-8, ytol=5e-8, args=(), maxiter=50):
     aitken_iter = utils.scalar_aitken_iter
     for iter in range(maxiter):
         y1 = f(x1, *args)
-        if y1 == y0: return x1
+        if abs_(y1) < ytol: return x1
+        if y1 == y0 or abs_(dx) < xtol: break 
         x0 = x1 - y1*dx/(y1-y0) # x0 = g
         dx = x0-x1
-        if abs_(dx) < xtol or abs_(y1) < ytol: return x0
         y0 = y1
         y1 = f(x0, *args)
-        if y1 == y0: return x0
+        if abs_(y1) < ytol: return x0
+        if y1 == y0 or abs_(dx) < xtol: x1 = x0; break 
         x2 = x0 - y1*dx/(y1-y0) # x2 = gg
-        if abs_(dx) < xtol or abs_(y1) < ytol: return x2
         dx = x1 - x0 # x - g
         x1 = aitken_iter(x1, x2, dx, x2 - x0)
         dx = x1 - x0
         y0 = y1
+    utils.raise_root_error(checkroot)
     return x1
