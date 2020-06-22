@@ -74,15 +74,16 @@ Parameters for each solver are pretty consitent and straight forward:
   
 * **xtol=1e-8**: Solver stops when the root lies within `xtol`.
 
-* **ytol=5e-8**:
-  
-  * Bounded or open solvers: Stop when the f(x) lies within `ytol` of the root.
+* **ytol=5e-8**: Stop when the f(x) lies within `ytol` of the root.
 
 * **args=()**: Arguments to pass to `f`.
 
 * **maxiter=50**: Maximum number of iterations.
 
-* **checkroot=True**: Whether to raise a RuntimeError when root tolerance is not satisfied.
+* **checkroot=True**: Whether to raise a RuntimeError when root tolerance, `ytol`, is not satisfied.
+
+Iterative solvers (which solve functions of the form f(x) = x) do not accept
+a `ytol` argument as xtol and ytol are actually mathematically equivalent.
 
 Here are some exmples using flexsolve's Profiler object to test and compare
 different solvers. In the graphs, the points are the solver iterations and 
