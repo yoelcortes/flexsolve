@@ -199,7 +199,7 @@ process recycle stream flow rates and vapor-liquid equili
 Warning
 -------
 Solvers in flexsolve do not garantee a good solution. Once the solver reaches
-the given maximum number of iterations, `maxiter` or the absolute tolerance
+the given maximum number of iterations, `maxiter`, or the absolute tolerance
 in x, `xtol`, the solver returns the last solution without the need to 
 satisty the tolerane in f(x), `ytol`. It is entirely up to the user to check
 if the given value is an appropriate solution.
