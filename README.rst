@@ -54,8 +54,6 @@ Flexsolve solvers can solve a variety of specifications:
 
   * **secant**: Simple secant method.
 
-  * **wegstein_secant**: Secant method with Wegstein acceleration.
-
   * **aitken_secant**: Secant method with Aitken acceleration.
 
 Parameters for each solver are pretty consitent and straight forward:
