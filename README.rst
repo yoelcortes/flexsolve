@@ -117,9 +117,6 @@ help us relate the points to the curve (not an actual interval):
 
     >>> p = flx.Profiler(f)
     >>> x_guess = -5
-    >>> flx.wegstein_secant(p, x_guess)
-    3.22524046279178
-    >>> p.archive('Wegstein')
     >>> flx.aitken_secant(p, x_guess)
     3.22524046279178
     >>> p.archive('Aitken')
