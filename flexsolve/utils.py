@@ -89,7 +89,7 @@ def fixedpoint_converged(dx, xtol):
         return scalar_fixedpoint_converged(dx, xtol)
 
 @overload(fixedpoint_converged)
-def fixedpoint_converged(dx, xtol):
+def jit_fixedpoint_converged(dx, xtol):
     if isinstance(dx, types.Array) and dx.ndim:
         return array_fixedpoint_converged
     else:
@@ -162,7 +162,3 @@ def raise_root_error(not_satisfied):
     if not_satisfied:
         raise RuntimeError('root could not be solved within error tolerance')
         
-@njitable(cache=True)
-def raise_bounds_error(y0, y1):
-    if y0 * y1 > 0.:
-        raise RuntimeError('f(x0) and f(x1) must have opposite signs')
