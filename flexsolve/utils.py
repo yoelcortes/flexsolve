@@ -140,3 +140,8 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
 def raise_root_error(not_satisfied):
     if not_satisfied:
         raise RuntimeError('root could not be solved within error tolerance')
+        
+@njitable(cache=True)
+def raise_bounds_error(y0, y1):
+    if y0 * y1 > 0.:
+        raise RuntimeError('f(x0) and f(x1) must have opposite signs')

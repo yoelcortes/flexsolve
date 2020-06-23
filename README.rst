@@ -80,6 +80,8 @@ Parameters for each solver are pretty consitent and straight forward:
 
 * **checkroot=True**: Whether to raise a RuntimeError when root tolerance, `ytol`, is not satisfied.
 
+* **checkbounds=True**: Whether to raise a ValueError when in a bounded solver when the root is not certain to lie within bounds (i.e. f(x0) * f(x1) > 0.).
+
 Here are some examples using flexsolve's Profiler object to test and compare
 different solvers. In the graphs, the points are the solver iterations and 
 the lines represent f(x). The lines and points are offset to make them more visible

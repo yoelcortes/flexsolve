@@ -38,7 +38,7 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
 @njit_alternative
 def false_position(f, x0, x1, y0=None, y1=None, x=None,
                    xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
-                   checkroot=True):
+                   checkroot=True, checkbounds=True):
     """False position solver."""
     if x is None: x = 1e32
     if y0 is None: y0 = f(x0, *args)
@@ -53,6 +53,8 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
     else:
         x_best = x1
         err_best = err1
+    if checkbounds and y0 * y1 > 0.:
+        raise ValueError('f(x0) and f(x1) must have opposite signs')
     dx = x1 - x0
     df = - y0
     false_position_iter = utils.false_position_iter
@@ -79,8 +81,8 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
     return x_best
 
 @njit_alternative
-def bisection(f, x0, x1, y0=None, y1=None, xtol=1e-6, ytol=5e-8, args=(),
-              maxiter=50, checkroot=True):
+def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=1e-6, ytol=5e-8, args=(),
+              maxiter=50, checkroot=True, checkbounds=True):
     """Bisection solver."""
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
@@ -95,8 +97,10 @@ def bisection(f, x0, x1, y0=None, y1=None, xtol=1e-6, ytol=5e-8, args=(),
     else:
         x_best = x1
         err_best = err1
+    if checkbounds and y0 * y1 > 0.:
+        raise ValueError('f(x0) and f(x1) must have opposite signs')
     bisect = utils.bisect
-    x = bisect(x0, x1)
+    if x is None: x = bisect(x0, x1)
     nytol = -ytol
     for iter in range(maxiter):
         y = f(x, *args)
@@ -120,7 +124,7 @@ def bisection(f, x0, x1, y0=None, y1=None, xtol=1e-6, ytol=5e-8, args=(),
 @njit_alternative
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
                      xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
-                     checkroot=True):
+                     checkroot=True, checkbounds=True):
     """Inverse quadratic interpolation solver."""
     abs_ = abs
     if y0 is None: y0 = f(x0, *args)
@@ -139,6 +143,8 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
     else:
         x_best = x1
         err_best = err1
+    if checkbounds and y0 * y1 > 0.:
+        raise ValueError('f(x0) and f(x1) must have opposite signs')
     nytol = -ytol
     for iter in range(maxiter):
         y = f(x, *args)
