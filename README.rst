@@ -48,7 +48,7 @@ Flexsolve solvers can solve a variety of specifications:
 
   * **false_position**: Simple false position method.
 
-  * **IQ_interpolation**: Quadratic interpolation solver (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
+  * **IQ_interpolation**: Inverse quadratic interpolation solver (similar to `scipy.optimize.brentq <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.optimize.brentq.html>`__)
 
 * Solve x where f(x) = 0 (open):
 
