@@ -10,10 +10,10 @@ from flexsolve import utils
 __all__ = ('secant', 'aitken_secant')
 
 @njit_alternative
-def secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
+def secant(f, x0, x1=None, xtol=None, ytol=5e-8, args=(), maxiter=50,
            checkroot=True):
     """Secant solver."""
-    if x1 is None: x1 = x0 + xtol
+    if x1 is None: x1 = x0 + 1e-5
     y0 = f(x0, *args)
     abs_ = abs
     if abs_(y0) < ytol: return x0
@@ -21,7 +21,7 @@ def secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
     for iter in range(maxiter): 
         y1 = f(x1, *args)
         if abs_(y1) < ytol: return x1
-        if y1 == y0 or abs_(dx) < xtol: break 
+        if y1 == y0 or (xtol and abs_(dx) < xtol): break 
         x1 = x0 - y1*dx/(y1-y0)
         dx = x1-x0 
         x0 = x1
@@ -30,10 +30,10 @@ def secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
     return x1
 
 @njit_alternative
-def aitken_secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
+def aitken_secant(f, x0, x1=None, xtol=None, ytol=5e-8, args=(), maxiter=50,
                   checkroot=True):
     """Secant solver with Aitken acceleration."""
-    if x1 is None: x1 = x0 + xtol
+    if x1 is None: x1 = x0 + 1e-5
     abs_ = abs
     y0 = f(x0, *args)
     if abs_(y0) < ytol: return x0
@@ -42,13 +42,13 @@ def aitken_secant(f, x0, x1=None, xtol=1e-6, ytol=5e-8, args=(), maxiter=50,
     for iter in range(maxiter):
         y1 = f(x1, *args)
         if abs_(y1) < ytol: return x1
-        if y1 == y0 or abs_(dx) < xtol: break 
+        if y1 == y0 or (xtol and abs_(dx) < xtol): break 
         x0 = x1 - y1*dx/(y1-y0) # x0 = g
         dx = x0-x1
         y0 = y1
         y1 = f(x0, *args)
         if abs_(y1) < ytol: return x0
-        if y1 == y0 or abs_(dx) < xtol: x1 = x0; break 
+        if y1 == y0 or (xtol and abs_(dx) < xtol): x1 = x0; break 
         x2 = x0 - y1*dx/(y1-y0) # x2 = gg
         dx = x1 - x0 # x - g
         x1 = aitken_iter(x1, x2, dx, x2 - x0)

@@ -71,7 +71,7 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
         except:
             x1 = g0
             g1 = f(x1, *args)
-        if (np.abs(g1 - x1) < xtol).all(): return g1
+        if utils.fixedpoint_converged(g1 - x1, xtol): return g1
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
@@ -107,10 +107,10 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
             x = gg
             g = f(x, *args)
         dxg = x - g
-        if (np.abs(dxg) < xtol).all(): return g
+        if utils.fixedpoint_converged(dxg, xtol): return g
         gg = f(g, *args)
         dgg_g = gg - g
-        if (np.abs(dgg_g) < xtol).all(): return gg
+        if utils.fixedpoint_converged(dgg_g, xtol): return gg
         x = aitken_iter(x, gg, dxg, dgg_g)
     utils.raise_root_error(checkroot)
     return gg
