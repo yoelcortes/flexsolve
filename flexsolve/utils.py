@@ -146,7 +146,7 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
     d01 = df0-df1
     d02 = df0-df2
     d12 = df1-df2
-    if abs(d01) > 1e-32 and abs(d02) > 1e-32 and abs(d12) > 1e-32:
+    if abs(d01) > 1e-16 and abs(d02) > 1e-16 and abs(d12) > 1e-16:
         df0_d12 = df0 / d12
         df1_d02 = df1 / d02
         df2_d01 = df2 / d01

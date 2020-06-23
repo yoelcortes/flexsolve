@@ -76,6 +76,10 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
     utils.raise_root_error(checkroot)
+    try: g1 = f(x1, *args)
+    except:
+        x1 = g0
+        g1 = f(x1, *args)
     return g1
 
 @njit_alternative
@@ -113,7 +117,11 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
         if utils.fixedpoint_converged(dgg_g, xtol): return gg
         x = aitken_iter(x, gg, dxg, dgg_g)
     utils.raise_root_error(checkroot)
-    return gg
+    try: g = f(x, *args)
+    except:
+        x = gg
+        g = f(x, *args)
+    return g
 
 @njit_alternative
 def conditional_aitken(f, x):
