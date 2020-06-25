@@ -37,7 +37,7 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
 
 @njit_alternative
 def false_position(f, x0, x1, y0=None, y1=None, x=None,
-                   xtol=None, ytol=5e-8, args=(), maxiter=50,
+                   xtol=0., ytol=5e-8, args=(), maxiter=50,
                    checkroot=True, checkbounds=True):
     """False position solver."""
     if x is None: x = 1e32
@@ -74,14 +74,14 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
             err_best = err
             x_best = x
         dx = x1 - x0
-        if xtol and abs_(dx) < xtol: break
+        if abs_(dx) < xtol: break
         x = false_position_iter(x0, x1, dx, y0, y1, df, x)
     if x_best != x: f(x, *args)
     utils.raise_root_error(checkroot and err_best < ytol)
     return x_best
 
 @njit_alternative
-def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=None, ytol=5e-8, args=(),
+def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
               maxiter=50, checkroot=True, checkbounds=True):
     """Bisection solver."""
     if y0 is None: y0 = f(x0, *args)
@@ -115,7 +115,7 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=None, ytol=5e-8, args=()
             err_best = err
             x_best = x
         dx = x1 - x0
-        if xtol and abs_(dx) < xtol: break
+        if abs_(dx) < xtol: break
         x = bisect(x0, x1)
     if x_best != x: f(x, *args)
     utils.raise_root_error(checkroot and err_best < ytol)
@@ -123,7 +123,7 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=None, ytol=5e-8, args=()
 
 @njit_alternative
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
-                     xtol=None, ytol=5e-8, args=(), maxiter=50,
+                     xtol=0., ytol=5e-8, args=(), maxiter=50,
                      checkroot=True, checkbounds=True):
     """Inverse quadratic interpolation solver."""
     abs_ = abs
@@ -164,7 +164,7 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
             err_best = err
             x_best = x
         dx = x1 - x0
-        if xtol and abs_(dx) < xtol: break
+        if abs_(dx) < xtol: break
         x = utils.IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, x)
     if x_best != x: f(x, *args)
     utils.raise_root_error(checkroot and err_best < ytol)
