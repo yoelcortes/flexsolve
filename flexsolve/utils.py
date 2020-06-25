@@ -158,7 +158,19 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
     return x
 
 @njitable(cache=True)
-def raise_root_error(not_satisfied):
-    if not_satisfied:
-        raise RuntimeError('root could not be solved within error tolerance')
+def raise_iter_error():
+    raise RuntimeError('maximum number of iterations exceeded; root could not be solved')
         
+@njitable(cache=True)
+def raise_tol_error():
+    raise RuntimeError('minimum tolerance reached; root could not be solved')
+
+@njitable(cache=True)
+def check_tols(xtol, ytol):        
+    if xtol !=0. and ytol != 0.:
+        raise ValueError("xtol and ytol must be postive to check root")
+
+@njitable(cache=True)
+def check_bounds(y0, y1):        
+    if y0 * y1 > 0.:
+        raise ValueError('f(x0) and f(x1) must have opposite signs')

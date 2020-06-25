@@ -20,7 +20,7 @@ __all__ = ('fixed_point',
 ) 
 
 def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
-                      checkroot=True):
+                      checkiter=True):
     """The least-squares solution of a matrix of prior iterations is partially
     used to iteratively esmitate the root."""
     lstsq = as_least_squares_iter(lstsq)
@@ -36,18 +36,18 @@ def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
                 x1 = f(x0)
         if (np.abs(x1 - x0) < xtol).all(): return x1
         x0 = lstsq(x0, x1)
-    utils.raise_root_error(checkroot)
+    if checkiter: utils.raise_iter_error()
     return x1
 
 @njit_alternative(cache=True)
-def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
+def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     """Iterative fixed-point solver."""
     x0 = x1 = x
     for iter in range(maxiter):
         x1 = f(x0, *args)
         if (np.abs(x1 - x0) < xtol).all(): return x1
         x0 = x1
-    utils.raise_root_error(checkroot)
+    if checkiter: utils.raise_iter_error()
     return x1
 
 @njit_alternative(cache=True)
@@ -60,7 +60,7 @@ def conditional_fixed_point(f, x):
         x0 = x1
 
 @njit_alternative(cache=True)
-def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
+def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     """Iterative Wegstein solver."""
     x0 = x
     x1 = g0 = f(x0, *args)
@@ -75,7 +75,7 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
-    utils.raise_root_error(checkroot)
+    if checkiter: utils.raise_iter_error()
     return x1
 
 @njit_alternative(cache=True)
@@ -97,7 +97,7 @@ def conditional_wegstein(f, x):
         g0 = g1
 
 @njit_alternative(cache=True)
-def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
+def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     """Iterative Aitken solver."""
     gg = x
     aitken_iter = utils.aitken_iter
@@ -112,7 +112,7 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkroot=True):
         dgg_g = gg - g
         if utils.fixedpoint_converged(dgg_g, xtol): return gg
         x = aitken_iter(x, gg, dxg, dgg_g)
-    utils.raise_root_error(checkroot)
+    if checkiter: utils.raise_iter_error()
     return x
 
 @njit_alternative(cache=True)

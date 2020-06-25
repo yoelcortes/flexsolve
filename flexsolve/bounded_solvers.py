@@ -38,8 +38,9 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
 @njit_alternative
 def false_position(f, x0, x1, y0=None, y1=None, x=None,
                    xtol=0., ytol=5e-8, args=(), maxiter=50,
-                   checkroot=True, checkbounds=True):
+                   checkroot=False, checkiter=True, checkbounds=True):
     """False position solver."""
+    if checkroot: utils.check_tols(xtol, ytol)
     if x is None: x = 1e32
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
@@ -53,8 +54,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
     else:
         x_best = x1
         err_best = err1
-    if checkbounds and y0 * y1 > 0.:
-        raise ValueError('f(x0) and f(x1) must have opposite signs')
+    if checkbounds: utils.check_bounds(y0, y1)
     dx = x1 - x0
     df = - y0
     false_position_iter = utils.false_position_iter
@@ -62,28 +62,34 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
         x = false_position_iter(x0, x1, dx, y0, y1, df, x0)
     for iter in range(maxiter):
         y = f(x, *args)
-        if y > ytol:
+        if y > 0:
             x1 = x
             err = y1 = y
-        elif y < -ytol:
+        elif y < 0.:
             x0 = x
             y0 = y
             err = df = -y0
-        else: return x
+        else:
+            return x
         if err < err_best:
             err_best = err
             x_best = x
         dx = x1 - x0
-        if abs_(dx) < xtol: break
+        xtol_satisfied = abs_(dx) < xtol
+        ytol_satisfied = err < ytol
+        if ytol_satisfied or xtol_satisfied: 
+            if checkroot and ytol_satisfied and xtol_satisfied: return x
+            else: checkiter = False; break
         x = false_position_iter(x0, x1, dx, y0, y1, df, x)
     if x_best != x: f(x, *args)
-    utils.raise_root_error(checkroot and err_best < ytol)
+    if checkiter: utils.raise_iter_error()
     return x_best
 
 @njit_alternative
 def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
-              maxiter=50, checkroot=True, checkbounds=True):
+              maxiter=50, checkroot=False, checkiter=True, checkbounds=True):
     """Bisection solver."""
+    if checkroot: utils.check_tols(xtol, ytol)
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
     if y1 < 0.:  x1, y1, x0, y0 = x0, y0, x1, y1
@@ -97,35 +103,39 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
     else:
         x_best = x1
         err_best = err1
-    if checkbounds and y0 * y1 > 0.:
-        raise ValueError('f(x0) and f(x1) must have opposite signs')
+    if checkbounds: utils.check_bounds(y0, y1)
     bisect = utils.bisect
     if x is None: x = bisect(x0, x1)
-    nytol = -ytol
     for iter in range(maxiter):
         y = f(x, *args)
-        if y > ytol:
+        if y > 0.:
             x1 = x
             err = y
-        elif y < nytol:
+        elif y < 0.:
             x0 = x
             err = -y
-        else: return x
+        else:
+            return x
         if err < err_best:
             err_best = err
             x_best = x
         dx = x1 - x0
-        if abs_(dx) < xtol: break
+        xtol_satisfied = abs_(dx) < xtol
+        ytol_satisfied = err < ytol
+        if ytol_satisfied or xtol_satisfied: 
+            if checkroot and ytol_satisfied and xtol_satisfied: return x
+            else: checkiter = False; break
         x = bisect(x0, x1)
     if x_best != x: f(x, *args)
-    utils.raise_root_error(checkroot and err_best < ytol)
+    if checkiter: utils.raise_iter_error()
     return x_best
 
 @njit_alternative
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
                      xtol=0., ytol=5e-8, args=(), maxiter=50,
-                     checkroot=True, checkbounds=True):
+                     checkroot=False, checkiter=True, checkbounds=True):
     """Inverse quadratic interpolation solver."""
+    if checkroot: utils.check_tols(xtol, ytol)
     abs_ = abs
     if y0 is None: y0 = f(x0, *args)
     if y1 is None: y1 = f(x1, *args)
@@ -143,31 +153,34 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
     else:
         x_best = x1
         err_best = err1
-    if checkbounds and y0 * y1 > 0.:
-        raise ValueError('f(x0) and f(x1) must have opposite signs')
-    nytol = -ytol
+    if checkbounds: utils.check_bounds(y0, y1)
     for iter in range(maxiter):
         y = f(x, *args)
-        if y > ytol:
+        if y > 0.:
             y2 = y1
             x2 = x1
             x1 = x
             err = y1 = y
-        elif y < nytol:
+        elif y < 0.:
             y2 = y0
             x2 = x0
             x0 = x
             y0 = y
             err = df0 = -y
-        else: return x
+        else:
+            return x
         if err < err_best:
             err_best = err
             x_best = x
         dx = x1 - x0
-        if abs_(dx) < xtol: break
+        xtol_satisfied = abs_(dx) < xtol
+        ytol_satisfied = err < ytol
+        if ytol_satisfied or xtol_satisfied: 
+            if checkroot and ytol_satisfied and xtol_satisfied: return x
+            else: checkiter = False; break
         x = utils.IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, x)
     if x_best != x: f(x, *args)
-    utils.raise_root_error(checkroot and err_best < ytol)
+    if checkiter: utils.raise_iter_error()
     return x_best
 
     

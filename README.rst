@@ -70,7 +70,7 @@ Parameters for each solver are pretty consitent and straight forward:
   
   * Open solvers: Initial and second guess. Second guess, 'x1', is optional.
   
-* **xtol=None**: Solver stops when the root lies within `xtol`.
+* **xtol=0.**: Solver stops when the root lies within `xtol`.
 
 * **ytol=5e-8**: Solver stops when the f(x) lies within `ytol` of the root. Iterative solvers (which solve functions of the form f(x) = x) do not accept a `ytol` argument as xtol and ytol are actually mathematically equivalent.
 
@@ -78,7 +78,9 @@ Parameters for each solver are pretty consitent and straight forward:
 
 * **maxiter=50**: Maximum number of iterations.
 
-* **checkroot=True**: Whether to raise a RuntimeError when root tolerance, `ytol`, is not satisfied.
+* **checkiter=True**: Whether to raise a Runtimer error when tolerance could not be satisfied before the maximum number of iterations.
+
+* **checkroot=False**: Whether satisfying both tolerances, `xtol` and `ytol`, are required for termination.
 
 * **checkbounds=True**: Whether to raise a ValueError when in a bounded solver when the root is not certain to lie within bounds (i.e. f(x0) * f(x1) > 0.).
 
