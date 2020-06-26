@@ -16,8 +16,8 @@ class Archive:
     
     def __init__(self, name, xs, ys):
         self.name = name
-        self.xs = np.array(xs, float)
-        self.ys = np.array(ys, float)
+        self.xs = np.array(xs)
+        self.ys = np.array(ys)
     
     def __len__(self):
         return len(self.xs)
@@ -54,10 +54,11 @@ class Archive:
 
 
 class Profiler:
-    __slots__ = ('f', 'xs', 'ys', 'archives')
-    def __init__(self, f, ):
+    __slots__ = ('f', 'xs', 'ys', 'active_archives', 'passed_cases', 'failed_cases')
+    def __init__(self, f):
         self.f = f
-        self.archives = []
+        self.active_archives = self.passed_cases = []
+        self.failed_cases = []
         self.xs = []
         self.ys = []
         
@@ -69,12 +70,27 @@ class Profiler:
         return y
     
     def archive(self, name):
-        self.archives.append(Archive(name, self.xs, self.ys))
+        self.active_archives.append(Archive(name, self.xs, self.ys))
         self.xs = []
         self.ys = []
 
+    def archive_case(self, case, failed=False):
+        archives = self.failed_cases if failed else self.passed_cases
+        archives.append(Archive(case, self.xs, self.ys))
+        self.xs = []
+        self.ys = []
+
+    def size(self):
+        return sum([len(archive) for archive in self.active_archives])
+
     def sizes(self):
         return {archive.name: len(archive) for archive in self.archives}
+    
+    def activate_failed_archives(self):
+        self.active_archives = self.failed_cases
+    
+    def activate_passed_archives(self):
+        self.active_archives = self.passed_cases
     
     def _plot_points(self, rxs, rys, offset, step):
         cycle = plt.rcParams['axes.prop_cycle']
@@ -158,3 +174,4 @@ class Profiler:
     
     def __repr__(self):
         return f"{type(self).__name__}({self.f})"
+    
