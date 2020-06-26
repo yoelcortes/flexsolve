@@ -236,7 +236,6 @@ def test_scalar_solvers_with_numba():
                     passed_cases += 1
             failed_problems += problem_failed
         results[:, i] = [passed_cases, failed_cases, failed_problems]
-    return results
     assert np.allclose(results, summary_values) 
    
 if __name__ == '__main__':
