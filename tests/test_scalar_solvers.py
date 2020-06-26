@@ -7,7 +7,6 @@
 # for license details.
 """
 """
-import pytest
 from math import log, exp, erf, pi, sin, cos
 from numba import njit
 import numpy as np
@@ -203,12 +202,11 @@ def test_scalar_solvers():
                                           solver_names=solver_names)
     assert np.allclose(df_summary.values, summary_values)
    
-@pytest.mark.slow
 def test_scalar_solvers_with_numba():
     summary_values = np.array(
-      [[68., 66., 59., 52.],
-       [ 9., 11., 18., 25.],
-       [ 6.,  8.,  9., 12.]]
+      [[68, 66, 59, 52],
+       [ 9, 11, 18, 25],
+       [ 6,  8,  9, 12]]
     )
     jitted_solvers = [njit(i) for i in solvers if i not in fixedpoint_solvers]
     jitted_fixedpoint_solvers = [njit(i) for i in fixedpoint_solvers]
