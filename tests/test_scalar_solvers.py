@@ -179,14 +179,29 @@ def roots_test_3(x):
     return 512*x**9 - 1024*x**7 + 672*x**5 - 160*x**3 +10*x
 
 
+def test_scalar_solvers():
+    solvers = [flx.secant, flx.aitken_secant, flx.wegstein, flx.aitken]
+    solver_names = [i.__name__ for i in solvers]
+    kwargs = [{'ytol': 1e-10}, {'ytol': 1e-10}, {'xtol': 1e-10}, {'xtol': 1e-10}]
+    summary_values = np.array([[65, 63, 62, 53],
+                               [12, 14, 15, 24],
+                               [ 6,  8,  8, 12]])
+    df_summary = test_problems.summary_df(solvers,
+                                          tol=1e-10,
+                                          solver_kwargs=kwargs,
+                                          solver_names=solver_names)
+    assert np.allclose(df_summary.values, summary_values)
+   
+    
 if __name__ == '__main__':
     solvers = [flx.secant, flx.aitken_secant, flx.wegstein, flx.aitken]
     solver_names = [i.__name__ for i in solvers]
     kwargs = [{'ytol': 1e-10}, {'ytol': 1e-10}, {'xtol': 1e-10}, {'xtol': 1e-10}]
     df_results = test_problems.results_df(solvers,
-                                  solver_kwargs=kwargs,
-                                  solver_names=solver_names)
+                                      tol=1e-10,
+                                      solver_kwargs=kwargs,
+                                      solver_names=solver_names)
     df_summary = test_problems.summary_df(solvers,
-                                  solver_kwargs=kwargs,
-                                  solver_names=solver_names)
-    
+                                          tol=1e-10,
+                                          solver_kwargs=kwargs,
+                                          solver_names=solver_names)
