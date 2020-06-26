@@ -7,12 +7,24 @@
 # for license details.
 """
 """
+import pytest
 from math import log, exp, erf, pi, sin, cos
+from numba import njit
 import numpy as np
 import flexsolve as flx
 
+flx.speed_up()
+fixedpoint_solvers = [flx.wegstein, flx.aitken]
+open_solvers = [flx.secant, flx.aitken_secant] 
+solvers = open_solvers + fixedpoint_solvers
+solver_names = [i.__name__ for i in solvers]
+kwargs = [{'ytol': 1e-10}, {'ytol': 1e-10}, {'xtol': 1e-11}, {'xtol': 1e-11}]
+for i in kwargs: i['maxiter'] = 100
 test_problems = flx.ProblemList()
-add_problem = test_problems.add_problem
+def add_problem(f=None, **kwargs):
+    if not f: return lambda f: add_problem(f, **kwargs)
+    f = njit(f, cache=True)
+    return test_problems.add_problem(f, **kwargs)
 
 ### Known problems ###
 
@@ -154,7 +166,7 @@ def gsl_test_3(x):
 
 @add_problem(cases=[-1.0/3, 1])
 def gsl_test_4(x):
-    return np.sign(x)*abs(x)**0.5
+    return x/abs(x)*abs(x)**0.5
 
 @add_problem(cases=[0, 1])
 def gsl_test_5(x):
@@ -180,23 +192,54 @@ def roots_test_3(x):
 
 
 def test_scalar_solvers():
-    solvers = [flx.secant, flx.aitken_secant, flx.wegstein, flx.aitken]
-    solver_names = [i.__name__ for i in solvers]
-    kwargs = [{'ytol': 1e-10}, {'ytol': 1e-10}, {'xtol': 1e-10}, {'xtol': 1e-10}]
-    summary_values = np.array([[65, 63, 62, 53],
-                               [12, 14, 15, 24],
-                               [ 6,  8,  8, 12]])
+    summary_values = np.array(
+      [[65, 64, 59, 52],
+       [12, 13, 18, 25],
+       [ 6,  7,  9, 12]]
+    )
     df_summary = test_problems.summary_df(solvers,
                                           tol=1e-10,
                                           solver_kwargs=kwargs,
                                           solver_names=solver_names)
     assert np.allclose(df_summary.values, summary_values)
    
-    
+@pytest.mark.slow
+def test_scalar_solvers_with_numba():
+    summary_values = np.array(
+      [[68., 66., 59., 52.],
+       [ 9., 11., 18., 25.],
+       [ 6.,  8.,  9., 12.]]
+    )
+    jitted_solvers = [njit(i) for i in solvers if i not in fixedpoint_solvers]
+    jitted_fixedpoint_solvers = [njit(i) for i in fixedpoint_solvers]
+    jitted_solvers = jitted_solvers + jitted_fixedpoint_solvers
+    results = np.zeros((3, len(jitted_solvers)))
+    for i, solver in enumerate(jitted_solvers):
+        failed_cases = 0
+        passed_cases = 0
+        failed_problems = 0
+        isfixedpoint = solver in jitted_fixedpoint_solvers
+        kwargsi = kwargs[i]
+        for problem in test_problems:
+            if isfixedpoint: f = problem.f_fixedpoint_jit
+            else: f = problem.f
+            problem_failed = False
+            for case in problem.cases:
+                try:
+                    if isfixedpoint: case = 0.
+                    x = solver(f, case, **kwargsi)
+                    assert abs(problem.f(x)) <= 1e-10, "result not within tolerance"
+                except:
+                    problem_failed = True
+                    failed_cases += 1
+                else:
+                    passed_cases += 1
+            failed_problems += problem_failed
+        results[:, i] = [passed_cases, failed_cases, failed_problems]
+    return results
+    assert np.allclose(results, summary_values) 
+   
 if __name__ == '__main__':
-    solvers = [flx.secant, flx.aitken_secant, flx.wegstein, flx.aitken]
-    solver_names = [i.__name__ for i in solvers]
-    kwargs = [{'ytol': 1e-10}, {'ytol': 1e-10}, {'xtol': 1e-10}, {'xtol': 1e-10}]
     df_results = test_problems.results_df(solvers,
                                       tol=1e-10,
                                       solver_kwargs=kwargs,

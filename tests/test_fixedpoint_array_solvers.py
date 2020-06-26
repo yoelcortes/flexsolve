@@ -14,7 +14,7 @@ stoichiometry = np.array([-1, 0.5, 2, 1, 0.1, 0.001, 0, 0])
 feed = np.array([20, 10, 0, 0, 0, 0, 30, 15], dtype=float)
 recycle = np.zeros_like(feed)
 
-@flx.njitable
+@flx.njitable(cache=True)
 def f(x):
     if (x < 0.).any():
         raise Exception('negative values are infeasible')
@@ -25,7 +25,7 @@ def f(x):
     product = effluent * 0.1
     return effluent - product
 
-def create_plot(line=False):
+def create_plot(p, line=False):
     xs = np.array(p.xs)
     ys = np.array(p.ys)
     xs = np.abs(xs).sum(0)
