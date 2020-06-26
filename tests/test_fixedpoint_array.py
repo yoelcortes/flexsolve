@@ -49,5 +49,5 @@ p.archive('Fixed point')
 print(p.sizes())
 
 flx.speed_up()
-flx.fast.wegstein(f, feed, xtol=5e-8)
-flx.fast.aitken(f, feed, xtol=5e-8)
+flx.wegstein(f, feed, xtol=5e-8)
+flx.aitken(f, feed, xtol=5e-8)

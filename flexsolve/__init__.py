@@ -13,7 +13,6 @@ from . import problem_list
 from . import profiler
 from . import problem
 from . import utils
-from . import fast
 
 __all__ = (*open_solvers.__all__,
            *bounded_solvers.__all__,
@@ -24,7 +23,6 @@ __all__ = (*open_solvers.__all__,
            *profiler.__all__,
            *jit_speed.__all__,
            'utils',
-           'fast',
 )
 
 from .jit_speed import *

@@ -167,7 +167,7 @@ def raise_tol_error():
 
 @njitable(cache=True)
 def check_tols(xtol, ytol):        
-    if xtol !=0. and ytol != 0.:
+    if xtol <= 0. or ytol <= 0.:
         raise ValueError("xtol and ytol must be postive to check root")
 
 @njitable(cache=True)

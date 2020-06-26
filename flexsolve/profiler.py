@@ -84,7 +84,7 @@ class Profiler:
         return sum([len(archive) for archive in self.active_archives])
 
     def sizes(self):
-        return {archive.name: len(archive) for archive in self.archives}
+        return {archive.name: len(archive) for archive in self.active_archives}
     
     def activate_failed_archives(self):
         self.active_archives = self.failed_cases
@@ -95,7 +95,7 @@ class Profiler:
     def _plot_points(self, rxs, rys, offset, step):
         cycle = plt.rcParams['axes.prop_cycle']
         colors = cycle.by_key()['color']
-        archives = self.archives
+        archives = self.active_archives
         for color, archive in zip(colors, archives):
             xs = archive.xs
             ys = archive.ys + offset
@@ -108,7 +108,7 @@ class Profiler:
              plot_outside_bounds=True, N=50, shade=True,
              remove_ticks=True):
         plt.figure()
-        archives = self.archives
+        archives = self.active_archives
         archives.sort(key=lambda x: x.size)
         x_mins = np.array([i.x_min for i in archives])
         x_maxs = np.array([i.x_max for i in archives])

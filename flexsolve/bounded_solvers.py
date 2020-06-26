@@ -5,14 +5,14 @@ Created on Tue Jul  9 00:35:01 2019
 @author: yoelr
 """
 import numpy as np
-from .jit_speed import njit_alternative
+from numba.extending import register_jitable
 from . import utils
 __all__ = ('false_position', 'bisection', 
            'IQ_interpolation', 'find_bracket')
 
 # %% Tools
 
-@njit_alternative
+@register_jitable(cache=True)
 def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
     """
     Return a bracket within `x0` and `x1` where the objective function, `f`, is 
@@ -35,7 +35,7 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
     
 # %% Solvers
 
-@njit_alternative
+@register_jitable(cache=True)
 def false_position(f, x0, x1, y0=None, y1=None, x=None,
                    xtol=0., ytol=5e-8, args=(), maxiter=50,
                    checkroot=False, checkiter=True, checkbounds=True):
@@ -85,7 +85,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
     if checkiter: utils.raise_iter_error()
     return x_best
 
-@njit_alternative
+@register_jitable(cache=True)
 def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
               maxiter=50, checkroot=False, checkiter=True, checkbounds=True):
     """Bisection solver."""
@@ -130,7 +130,7 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
     if checkiter: utils.raise_iter_error()
     return x_best
 
-@njit_alternative
+@register_jitable(cache=True)
 def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
                      xtol=0., ytol=5e-8, args=(), maxiter=50,
                      checkroot=False, checkiter=True, checkbounds=True):

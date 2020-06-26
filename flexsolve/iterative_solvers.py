@@ -5,7 +5,7 @@ Created on Tue Apr 28 16:56:59 2020
 @author: yoelr
 """
 import numpy as np
-from flexsolve.jit_speed import njit_alternative
+from numba.extending import register_jitable
 from flexsolve.least_squares_iteration import as_least_squares_iter
 from . import utils
 
@@ -39,7 +39,7 @@ def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
     if checkiter: utils.raise_iter_error()
     return x1
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     """Iterative fixed-point solver."""
     x0 = x1 = x
@@ -50,7 +50,7 @@ def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     if checkiter: utils.raise_iter_error()
     return x1
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def conditional_fixed_point(f, x):
     """Conditional iterative fixed-point solver."""
     x0 = x1 = x
@@ -59,7 +59,7 @@ def conditional_fixed_point(f, x):
         x1, condition = f(x0)
         x0 = x1
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     """Iterative Wegstein solver."""
     x0 = x
@@ -78,7 +78,7 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     if checkiter: utils.raise_iter_error()
     return x1
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def conditional_wegstein(f, x):
     """Conditional iterative Wegstein solver."""
     x0 = x
@@ -96,7 +96,7 @@ def conditional_wegstein(f, x):
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     """Iterative Aitken solver."""
     gg = x
@@ -115,7 +115,7 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     if checkiter: utils.raise_iter_error()
     return x
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def conditional_aitken(f, x):
     """Conditional iterative Aitken solver."""
     condition = True

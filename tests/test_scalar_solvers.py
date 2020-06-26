@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+# Flexsolve: Flexible function solvers.
+# Copyright (C) 2019-2020, Yoel Cortes-Pena <yoelcortes@gmail.com>, Caleb Bell <<Caleb.Andrew.Bell@gmail.com>
+# 
+# This module is under the MIT open-source license. See 
+# github.com/yoelcortes/flexsolve/blob/master/LICENSE.txt
+# for license details.
 """
-Created on Thu Jun 25 19:58:16 2020
-
-@author: yrc2
 """
-
 from math import log, exp, erf, pi, sin, cos
 import numpy as np
 import flexsolve as flx

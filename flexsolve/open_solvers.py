@@ -4,13 +4,13 @@ Created on Tue Nov 19 22:50:26 2019
 
 @author: yoelr
 """
-from flexsolve.jit_speed import njit_alternative
+from numba.extending import register_jitable
 from flexsolve.bounded_solvers import IQ_interpolation
 from flexsolve import utils
 
 __all__ = ('secant', 'aitken_secant')
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
            checkroot=False, checkiter=True):
     """Secant solver."""
@@ -43,7 +43,7 @@ def secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     if checkiter: utils.raise_iter_error()
     return x1
 
-@njit_alternative(cache=True)
+@register_jitable(cache=True)
 def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
                   checkroot=False, checkiter=True):
     """Secant solver with Aitken acceleration."""
@@ -77,7 +77,6 @@ def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
                                         checkroot, False)
             else:
                 oscillating = True
-            
         x0 = x1 - y1*dx/(y1-y0) # x0 = g
         dx = x0-x1
         y0 = y1
