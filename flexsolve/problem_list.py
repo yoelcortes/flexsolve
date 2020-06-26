@@ -46,7 +46,7 @@ class ProblemList(list):
         problem_profiles = [self.profiles_list(i, tol, j) for i,j in zip(solvers, solver_kwargs)]
         passed_cases = [sum([len(i.passed_cases) for i in j]) for j in problem_profiles]
         failed_cases = [sum([len(i.failed_cases) for i in j]) for j in problem_profiles]
-        failed_problems = [sum([not i.failed_cases for i in j]) for j in problem_profiles]
+        failed_problems = [sum([bool(i.failed_cases) for i in j]) for j in problem_profiles]
         data = np.array([passed_cases, failed_cases, failed_problems])
         return pd.DataFrame(data, columns=solver_names, index=['Passed cases', 'Failed cases', 'Failed problems'])
     
