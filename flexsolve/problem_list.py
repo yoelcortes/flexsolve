@@ -19,28 +19,20 @@ class ProblemList(list):
         self.append(problem)
         return problem
     
-    def profiles_list(self, solver, kwargs):
+    def profiles_list(self, solver, tol, kwargs):
         if isinstance(kwargs, Mapping):
-            return [i.profile_solver(solver, 1e-10, kwargs) for i in self]
+            return [i.profile_solver(solver, tol, kwargs) for i in self]
         else:
-            return [i.profile_solver(solver, 1e-10, j) for i,j in zip(self, kwargs)]
+            return [i.profile_solver(solver, tol, j) for i,j in zip(self, kwargs)]
     
-    def profiles_dict(self, solver, kwargs):
+    def profiles_dict(self, solver, tol, kwargs):
         if isinstance(kwargs, Mapping):
-            return {i.name: i.profile_solver(solver, 1e-10, kwargs) for i in self}
+            return {i.name: i.profile_solver(solver, tol, kwargs) for i in self}
         else:
-            return {i.name: i.profile_solver(solver, 1e-10, j) for i,j in zip(self, kwargs)}
-    
-    def profiles_dicts(self, solvers, solver_kwargs=None, solver_names=None):
-        solver_kwargs = solver_kwargs or {}
-        solver_names = solver_names or [i.__name__ for i in solvers]
-        return {
-            name: self.profiles(solver, kwargs)
-            for name, solver, kwargs in zip(solver_names, solvers, solver_kwargs)
-        }
+            return {i.name: i.profile_solver(solver, tol, j) for i,j in zip(self, kwargs)}
         
-    def results_df(self, solvers, solver_kwargs=None, solver_names=None):
-        solver_problem_profiles = [self.profiles_list(i, j) for i,j in zip(solvers, solver_kwargs)]
+    def results_df(self, solvers, tol, solver_kwargs=None, solver_names=None):
+        solver_problem_profiles = [self.profiles_list(i, tol, j) for i,j in zip(solvers, solver_kwargs)]
         problem_names = [i.name for i in self]
         problem_fields = ['Iterations', 'Passed', 'Failed']
         multi_index = pd.MultiIndex.from_product([problem_names, problem_fields], names=['Problem', 'Summary'])
@@ -50,8 +42,8 @@ class ProblemList(list):
         data = np.array(data).transpose()
         return pd.DataFrame(data, columns=columns, index=multi_index)
     
-    def summary_df(self, solvers, solver_kwargs=None, solver_names=None):
-        problem_profiles = [self.profiles_list(i, j) for i,j in zip(solvers, solver_kwargs)]
+    def summary_df(self, solvers, tol, solver_kwargs=None, solver_names=None):
+        problem_profiles = [self.profiles_list(i, tol, j) for i,j in zip(solvers, solver_kwargs)]
         passed_cases = [sum([len(i.passed_cases) for i in j]) for j in problem_profiles]
         failed_cases = [sum([len(i.failed_cases) for i in j]) for j in problem_profiles]
         failed_problems = [sum([not i.failed_cases for i in j]) for j in problem_profiles]
