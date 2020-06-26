@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Flexsolve: Flexible function solvers.
-# Copyright (C) 2019-2020, Yoel Cortes-Pena <yoelcortes@gmail.com>, Caleb Bell <<Caleb.Andrew.Bell@gmail.com>
+# Copyright (C) 2019-2020, Yoel Cortes-Pena <yoelcortes@gmail.com>, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 # 
 # This module is under the MIT open-source license. See 
 # github.com/yoelcortes/flexsolve/blob/master/LICENSE.txt
