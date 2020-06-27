@@ -248,7 +248,7 @@ def test_scalar_solvers():
     assert np.allclose(df_summary.values, summary_values)
    
 def test_scalar_solvers_with_numba():
-    # This test takes about 3 min because we are compiling 
+    # This test takes about 15 sec because we are compiling 
     # every solver-problem version. There is no way to cache all these
     # due to weakrefs (unless we use dill instead of pickle for numba).
     summary_values = np.array(
