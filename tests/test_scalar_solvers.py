@@ -86,6 +86,8 @@ def Wallis_example(x, fixedpoint=False):
     y = x**3 - 2*x - 5
     return y + x if fixedpoint else y
 
+named_problems = test_problems[:]  
+
 ### Unnamed ###
 
 @add_problem(cases=[0.1])
@@ -137,7 +139,9 @@ def zero_test_9(x, fixedpoint=False):
 def zero_test_10(x, fixedpoint=False):
     y = cos(100.0*x) - 4.0*erf(30*x - 10)
     return y + x if fixedpoint else y
-        
+
+other_problems = test_problems[-10:]        
+
 ### From Scipy ###
 
 @add_problem(cases=[3,])
@@ -175,6 +179,8 @@ def scipy_GH8881(x, fixedpoint=False):
     y = x**(1.00/9.0) - 9**(1.0/9)
     return y + x if fixedpoint else y
         
+scipy_problems = test_problems[-7:]
+
 ### From gsl ###
         
 @add_problem(cases=[3, 4, -4, -3, -1/3., 1])
@@ -206,7 +212,9 @@ def gsl_test_5(x, fixedpoint=False):
 def gsl_test_6(x, fixedpoint=False):
     y = (x-1.0)**7
     return y + x if fixedpoint else y
-        
+
+gsl_problems = test_problems[-6:]
+
 ### From Roots.jl ###
 
 @add_problem(cases=[0, 1])
@@ -224,12 +232,14 @@ def roots_test_3(x, fixedpoint=False):
     y = 512*x**9 - 1024*x**7 + 672*x**5 - 160*x**3 +10*x
     return y + x if fixedpoint else y
 
+julia_problems = test_problems[-3:]
+
 
 def test_scalar_solvers():
     summary_values = np.array(
-        [[65, 64, 59, 55],
-         [12, 13, 18, 22],
-         [ 6,  7,  9, 11]]
+        [[68, 66, 51, 42],
+         [ 9, 11, 26, 35],
+         [ 6,  8, 13, 18]]
     )
     df_summary = test_problems.summary_df(solvers,
                                           tol=1e-10,
@@ -242,9 +252,9 @@ def test_scalar_solvers_with_numba():
     # every solver-problem version. There is no way to cache all these
     # due to weakrefs (unless we use dill instead of pickle for numba).
     summary_values = np.array(
-        [[68., 66., 59., 55.],
-         [ 9., 11., 18., 22.],
-         [ 6.,  8.,  9., 11.]]
+       [[10, 10,  6,  6],
+        [ 0,  0,  4,  4],
+        [ 0,  0,  2,  2]]
     )
     jitted_open_solvers = [njit(i) for i in open_solvers]
     jitted_fixedpoint_solvers = [njit(i) for i in fixedpoint_solvers]
@@ -258,29 +268,20 @@ def test_scalar_solvers_with_numba():
         isfixedpoint = solver in jitted_fixedpoint_solvers
         args = (isfixedpoint,)
         kwargsi = kwargs[i]
-        for problem in test_problems:
+        for problem in julia_problems: # Only check a subset for numba
             f = problem.f
             problem_failed = False
-            if isfixedpoint:
-                N_cases = len(problem.cases)
+            for case in problem.cases:
+                if isfixedpoint:
+                    case = f(case) - case
                 try:
-                    x = solver(f, 0., args=args, **kwargsi)
+                    x = solver(f, case, args=args, **kwargsi)
                     assert abs_(f(x)) <= 1e-10, "result not within tolerance"
                 except:
-                    failed_cases += N_cases
                     problem_failed = True
+                    failed_cases += 1
                 else:
-                    passed_cases += N_cases
-            else:
-                for case in problem.cases:
-                    try:
-                        x = solver(f, case, args=args, **kwargsi)
-                        assert abs_(f(x)) <= 1e-10, "result not within tolerance"
-                    except:
-                        problem_failed = True
-                        failed_cases += 1
-                    else:
-                        passed_cases += 1
+                    passed_cases += 1
             failed_problems += problem_failed
         results[:, i] = [passed_cases, failed_cases, failed_problems]
     assert np.allclose(results, summary_values) 

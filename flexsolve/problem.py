@@ -29,11 +29,13 @@ class Problem:
         return self.f(x, *args) + x
     
     def profile_solver(self, solver, ytol, kwargs={}):
-        f = self.f_fixedpoint if solver in fixedpoint_solvers else self.f
+        isfixedpoint = solver in fixedpoint_solvers
+        f = self.f_fixedpoint if isfixedpoint else self.f
         p = Profiler(f)
         for case in self.cases:
+            if isfixedpoint: case = f(case) - case
             try: 
-                x = solver(p, 0., **kwargs)
+                x = solver(p, case, **kwargs)
                 self.test(x, ytol, kwargs.get('args', ()))
             except: 
                 p.archive_case(case, failed=True)

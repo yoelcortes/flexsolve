@@ -12,6 +12,13 @@ __all__ = ('ProblemList',)
 
 class ProblemList(list):
     
+    def __getitem__(self, index):
+        items = super().__getitem__(index)
+        if isinstance(items, list):
+            return ProblemList(items)
+        else:
+            return items
+    
     def add_problem(self, f=None, cases=()):
         if not f: return lambda f: self.add_problem(f, cases)
         problem = Problem(f, cases)
