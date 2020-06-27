@@ -130,3 +130,4 @@ def conditional_aitken(f, x):
         if not condition: return g
         gg, condition = f(g)
         x = aitken_iter(x, gg, x - g, gg - g)
+        

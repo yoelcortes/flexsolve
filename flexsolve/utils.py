@@ -4,7 +4,7 @@ Created on Mon Apr 20 16:41:04 2020
 
 @author: yoelr
 """
-from flexsolve.jit_speed import njitable
+from .jit_speed import njitable
 from numba.extending import overload, register_jitable
 from collections.abc import Iterable
 from numba import types

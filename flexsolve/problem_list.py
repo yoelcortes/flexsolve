@@ -4,7 +4,6 @@ Created on Thu Jun 25 22:50:56 2020
 
 @author: yrc2
 """
-from collections.abc import Mapping
 from .problem import Problem
 import pandas as pd
 import numpy as np
@@ -20,16 +19,10 @@ class ProblemList(list):
         return problem
     
     def profiles_list(self, solver, tol, kwargs):
-        if isinstance(kwargs, Mapping):
-            return [i.profile_solver(solver, tol, kwargs) for i in self]
-        else:
-            return [i.profile_solver(solver, tol, j) for i,j in zip(self, kwargs)]
+        return [i.profile_solver(solver, tol, kwargs) for i in self]
     
     def profiles_dict(self, solver, tol, kwargs):
-        if isinstance(kwargs, Mapping):
-            return {i.name: i.profile_solver(solver, tol, kwargs) for i in self}
-        else:
-            return {i.name: i.profile_solver(solver, tol, j) for i,j in zip(self, kwargs)}
+        return {i.name: i.profile_solver(solver, tol, kwargs) for i in self}
         
     def results_df(self, solvers, tol, solver_kwargs=None, solver_names=None):
         solver_problem_profiles = [self.profiles_list(i, tol, j) for i,j in zip(solvers, solver_kwargs)]

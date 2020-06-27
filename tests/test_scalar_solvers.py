@@ -28,173 +28,208 @@ def add_problem(f=None, **kwargs):
 ### Known problems ###
 
 @add_problem(cases=[6.25 + 5.0, 6.25 - 1.0, 6.25 + 0.1])
-def newton_baffler(x):
-    x = x - 6.25
+def newton_baffler(x, fixedpoint=False):
+    y = x - 6.25
     if x < -0.25:
-        return 0.75*x- 0.3125
+        y = 0.75*y- 0.3125
     elif x < 0.25:
-        return 2.0*x
+        y = 2.0*y
     else:
-        return 0.75*x + 0.3125
+        y = 0.75*y + 0.3125
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[2, 0.5, 4])
-def flat_stanley(x):
+def flat_stanley(x, fixedpoint=False):
     if x == 1:
-        return 0
+        y = 0
     else:
         factor = (-1.0 if x < 1.0 else 1.0)
-        return factor*exp(log(1000) + log(abs(x - 1.0)) - 1.0/(x - 1.0)**2)
+        y = factor*exp(log(1000) + log(abs(x - 1.0)) - 1.0/(x - 1.0)**2)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0.01, -0.25])
-def newton_pathological(x):
+def newton_pathological(x, fixedpoint=False):
     if x == 0.0:
-        return 0.0
+        y = 0.0
     else:
         factor = (-1.0 if x < 0.0 else 1.0)
-        return factor*abs(x)**(1.0/3.0)*exp(-x**2)
+        y = factor*abs(x)**(1.0/3.0)*exp(-x**2)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[1., -0.14, 0.041])
-def repeller(x):
-     return 20*x/(100*x**2 + 1)
+def repeller(x, fixedpoint=False):
+    y = 20*x/(100*x**2 + 1)
+    return y + x if fixedpoint else y
     
 @add_problem(cases=[.25, 5., 1.1])
-def pinhead(x):
-    return (16 - x**4)/(16*x**4 + 0.00001)
+def pinhead(x, fixedpoint=False):
+    y = (16 - x**4)/(16*x**4 + 0.00001)
+    return y + x if fixedpoint else y
     
 @add_problem(cases=[100., 1.])
-def lazy_boy(x):
-    return 0.00000000001*(x - 100)
+def lazy_boy(x, fixedpoint=False):
+    y = 0.00000000001*(x - 100)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0., 5+180., 5.])
-def kepler(x):
-    return pi*(x - 5.0)/180.0 - 0.8*sin(pi*x/180)
+def kepler(x, fixedpoint=False):
+    y = pi*(x - 5.0)/180.0 - 0.8*sin(pi*x/180)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[3., -0.5, 0, 2.12742])
-def camel(x):
-    return 1.0/((x - 0.3)**2 + 0.01) + 1.0/((x - 0.9)**2 + 0.04) + 2.0*x - 5.2
+def camel(x, fixedpoint=False):
+    y = 1.0/((x - 0.3)**2 + 0.01) + 1.0/((x - 0.9)**2 + 0.04) + 2.0*x - 5.2
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[2., 3.])
-def Wallis_example(x):
-    return x**3 - 2*x - 5
+def Wallis_example(x, fixedpoint=False):
+    y = x**3 - 2*x - 5
+    return y + x if fixedpoint else y
 
 ### Unnamed ###
 
 @add_problem(cases=[0.1])
-def zero_test_1(x):
-    return sin(x) - x/2
+def zero_test_1(x, fixedpoint=False):
+    y = sin(x) - x/2
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[1.])
-def zero_test_2(x):
-    return 2*x - exp(-x)
+def zero_test_2(x, fixedpoint=False):
+    y = 2*x - exp(-x)
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[1.])
-def zero_test_3(x):
-    return x*exp(-x)
+def zero_test_3(x, fixedpoint=False):
+    y = x*exp(-x)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
-def zero_test_4(x):
-    return exp(x) - 1.0/(10.0*x)**2
+def zero_test_4(x, fixedpoint=False):
+    y = exp(x) - 1.0/(10.0*x)**2
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
-def zero_test_5(x):
-    return (x+3)*(x-1)**2
+def zero_test_5(x, fixedpoint=False):
+    y = (x+3)*(x-1)**2
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
-def zero_test_6(x):
-    return exp(x) - 2 - 1/(10*x)**2 + 2/(100*x)**3
+def zero_test_6(x, fixedpoint=False):
+    y = exp(x) - 2 - 1/(10*x)**2 + 2/(100*x)**3
+    return y + x if fixedpoint else y
        
 @add_problem(cases=[1.])
-def zero_test_7(x):
-    return x**3
+def zero_test_7(x, fixedpoint=False):
+    y = x**3
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
-def zero_test_8(x):
-    return cos(x) - x
+def zero_test_8(x, fixedpoint=False):
+    y = cos(x) - x
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[.99, 1.013])
-def zero_test_9(x):
-    return 10.0**14*(1.0*x**7 - 7.0*x**6 + 21.0*x**5 - 35.0*x**4 + 35.0*x**3 - 21.0*x**2 + 7.0*x - 1.0)
+def zero_test_9(x, fixedpoint=False):
+    y = 10.0**14*(1.0*x**7 - 7.0*x**6 + 21.0*x**5 - 35.0*x**4 + 35.0*x**3 - 21.0*x**2 + 7.0*x - 1.0)
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[0., 1., 0.5])
-def zero_test_10(x):
-    return cos(100.0*x) - 4.0*erf(30*x - 10)
+def zero_test_10(x, fixedpoint=False):
+    y = cos(100.0*x) - 4.0*erf(30*x - 10)
+    return y + x if fixedpoint else y
         
 ### From Scipy ###
 
 @add_problem(cases=[3,])
-def scipy_test_1(x):
-    return x**2 - 2*x - 1
+def scipy_test_1(x, fixedpoint=False):
+    y = x**2 - 2*x - 1
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[3,])
-def scipy_test_2(x):
-    return exp(x) - cos(x)
+def scipy_test_2(x, fixedpoint=False):
+    y = exp(x) - cos(x)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[-1e8, 1e7])
-def scipy_GH5555(x):
-    return x - 0.1
+def scipy_GH5555(x, fixedpoint=False):
+    y = x - 0.1
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0., 1.])
-def scipy_GH5557(x):
-    return -0.1 if x < 0.5 else x - 0.6 # Fail at 0 is expected - 0 slope
+def scipy_GH5557(x, fixedpoint=False):
+    y = -0.1 if x < 0.5 else x - 0.6 # Fail at 0 is expected - 0 slope
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[10*(200.0 - 6.828499381469512e-06) / (2.0 + 6.828499381469512e-06)])
-def zero_der_nz_dp(x):
-    return (x - 100.0)**2 
+def zero_der_nz_dp(x, fixedpoint=False):
+    y = (x - 100.0)**2 
+    return y + x if fixedpoint else y
     
 @add_problem(cases=[0., 0.5])
-def scipy_GH8904(x):
-    return x**3 - x**2
+def scipy_GH8904(x, fixedpoint=False):
+    y = x**3 - x**2
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[0., 0.5])
-def scipy_GH8881(x):
-    return x**(1.00/9.0) - 9**(1.0/9)
+def scipy_GH8881(x, fixedpoint=False):
+    y = x**(1.00/9.0) - 9**(1.0/9)
+    return y + x if fixedpoint else y
         
 ### From gsl ###
         
 @add_problem(cases=[3, 4, -4, -3, -1/3., 1])
-def gsl_test_1(x):
-    return sin(x)
+def gsl_test_1(x, fixedpoint=False):
+    y = sin(x)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0, 3, -3, 0])
-def gsl_test_2(x):
-    return cos(x)
+def gsl_test_2(x, fixedpoint=False):
+    y = cos(x)
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[0.1, 2])
-def gsl_test_3(x):
-    return x**20 - 1
+def gsl_test_3(x, fixedpoint=False):
+    y = x**20 - 1
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[-1.0/3, 1])
-def gsl_test_4(x):
-    return x/abs(x)*abs(x)**0.5
+def gsl_test_4(x, fixedpoint=False):
+    y = x/abs(x)*abs(x)**0.5
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0, 1])
-def gsl_test_5(x):
-    return x**2 - 1e-8
+def gsl_test_5(x, fixedpoint=False):
+    y = x**2 - 1e-8
+    return y + x if fixedpoint else y
         
 @add_problem(cases=[0.9995, 1.0002])
-def gsl_test_6(x):
-    return (x-1.0)**7
+def gsl_test_6(x, fixedpoint=False):
+    y = (x-1.0)**7
+    return y + x if fixedpoint else y
         
 ### From Roots.jl ###
 
 @add_problem(cases=[0, 1])
-def roots_test_1(x):
-    return abs(x - 0.0)
+def roots_test_1(x, fixedpoint=False):
+    y = abs(x - 0.0)
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0, -1, 1, 21])
-def roots_test_2(x):
-    return 1024*x**11 - 2816*x**9 + 2816*x**7 - 1232*x**5 + 220*x**3 - 11*x
+def roots_test_2(x, fixedpoint=False):
+    y = 1024*x**11 - 2816*x**9 + 2816*x**7 - 1232*x**5 + 220*x**3 - 11*x
+    return y + x if fixedpoint else y
 
 @add_problem(cases=[0, -1, 1, 7])
-def roots_test_3(x):
-    return 512*x**9 - 1024*x**7 + 672*x**5 - 160*x**3 +10*x
+def roots_test_3(x, fixedpoint=False):
+    y = 512*x**9 - 1024*x**7 + 672*x**5 - 160*x**3 +10*x
+    return y + x if fixedpoint else y
 
 
 def test_scalar_solvers():
     summary_values = np.array(
-      [[65, 64, 59, 52],
-       [12, 13, 18, 25],
-       [ 6,  7,  9, 12]]
+        [[65, 64, 59, 55],
+         [12, 13, 18, 22],
+         [ 6,  7,  9, 11]]
     )
     df_summary = test_problems.summary_df(solvers,
                                           tol=1e-10,
@@ -203,35 +238,49 @@ def test_scalar_solvers():
     assert np.allclose(df_summary.values, summary_values)
    
 def test_scalar_solvers_with_numba():
+    # This test takes about 3 min because we are compiling 
+    # every solver-problem version. There is no way to cache all these
+    # due to weakrefs (unless we use dill instead of pickle for numba).
     summary_values = np.array(
-      [[68, 66, 59, 52],
-       [ 9, 11, 18, 25],
-       [ 6,  8,  9, 12]]
+        [[68., 66., 59., 55.],
+         [ 9., 11., 18., 22.],
+         [ 6.,  8.,  9., 11.]]
     )
-    jitted_solvers = [njit(i) for i in solvers if i not in fixedpoint_solvers]
+    jitted_open_solvers = [njit(i) for i in open_solvers]
     jitted_fixedpoint_solvers = [njit(i) for i in fixedpoint_solvers]
-    jitted_solvers = jitted_solvers + jitted_fixedpoint_solvers
+    jitted_solvers = jitted_open_solvers + jitted_fixedpoint_solvers
     results = np.zeros((3, len(jitted_solvers)))
+    abs_ = abs
     for i, solver in enumerate(jitted_solvers):
         failed_cases = 0
         passed_cases = 0
         failed_problems = 0
         isfixedpoint = solver in jitted_fixedpoint_solvers
+        args = (isfixedpoint,)
         kwargsi = kwargs[i]
         for problem in test_problems:
-            if isfixedpoint: f = problem.f_fixedpoint_jit
-            else: f = problem.f
+            f = problem.f
             problem_failed = False
-            for case in problem.cases:
+            if isfixedpoint:
+                N_cases = len(problem.cases)
                 try:
-                    if isfixedpoint: case = 0.
-                    x = solver(f, case, **kwargsi)
-                    assert abs(problem.f(x)) <= 1e-10, "result not within tolerance"
+                    x = solver(f, 0., args=args, **kwargsi)
+                    assert abs_(f(x)) <= 1e-10, "result not within tolerance"
                 except:
+                    failed_cases += N_cases
                     problem_failed = True
-                    failed_cases += 1
                 else:
-                    passed_cases += 1
+                    passed_cases += N_cases
+            else:
+                for case in problem.cases:
+                    try:
+                        x = solver(f, case, args=args, **kwargsi)
+                        assert abs_(f(x)) <= 1e-10, "result not within tolerance"
+                    except:
+                        problem_failed = True
+                        failed_cases += 1
+                    else:
+                        passed_cases += 1
             failed_problems += problem_failed
         results[:, i] = [passed_cases, failed_cases, failed_problems]
     assert np.allclose(results, summary_values) 

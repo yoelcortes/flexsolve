@@ -182,6 +182,3 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
     if x_best != x: f(x, *args)
     if checkiter: utils.raise_iter_error()
     return x_best
-
-    
-    
