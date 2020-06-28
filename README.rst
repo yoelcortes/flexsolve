@@ -194,7 +194,7 @@ process recycle stream flow rates and vapor-liquid equili
 Bug reports
 -----------
 
-To report bugs, please use the eqsolvers's Bug Tracker at:
+To report bugs, please use the flexsolve's Bug Tracker at:
 
     https://github.com/yoelcortes/flexsolve
 
@@ -205,8 +205,8 @@ License information
 See ``LICENSE.txt`` for information on the terms & conditions for usage
 of this software, and a DISCLAIMER OF ALL WARRANTIES.
 
-Although not required by the eqsolvers license, if it is convenient for you,
-please cite eqsolvers if used in your work. Please also consider contributing
+Although not required by the flexsolve license, if it is convenient for you,
+please cite flexsolve if used in your work. Please also consider contributing
 any changes you make back, and benefit the community.
 
 

@@ -273,7 +273,8 @@ def test_scalar_solvers_with_numba():
             problem_failed = False
             for case in problem.cases:
                 if isfixedpoint:
-                    case = f(case) - case
+                    # More or less account f(x) = x instead of f(x) = 0
+                    case = f(case) - case 
                 try:
                     x = solver(f, case, args=args, **kwargsi)
                     assert abs_(f(x)) <= 1e-10, "result not within tolerance"
