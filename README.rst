@@ -189,7 +189,7 @@ capable of solving multi-dimensional problems. Simply make sure x is an array
 and f(x) returns an array with the same dimensions. In fact, the
 `The Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
 uses flexsolve to solve many chemical engineering problems, including 
-process recycle stream flow rates and vapor-liquid equili
+process recycle stream flow rates and vapor-liquid equilibrium.
 
 Bug reports
 -----------
