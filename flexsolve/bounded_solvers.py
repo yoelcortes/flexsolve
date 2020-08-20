@@ -81,7 +81,7 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
             if checkroot and ytol_satisfied and xtol_satisfied: return x
             else: checkiter = False; break
         x = false_position_iter(x0, x1, dx, y0, y1, df, x)
-    if x_best != x: f(x, *args)
+    if x_best != x: f(x_best, *args)
     if checkiter: utils.raise_iter_error()
     return x_best
 
@@ -110,9 +110,10 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
         y = f(x, *args)
         if y > 0.:
             x1 = x
-            err = y
+            y1 = err = y
         elif y < 0.:
             x0 = x
+            y0 = y
             err = -y
         else:
             return x
@@ -126,7 +127,7 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
             if checkroot and ytol_satisfied and xtol_satisfied: return x
             else: checkiter = False; break
         x = bisect(x0, x1)
-    if x_best != x: f(x, *args)
+    if x_best != x and y0 * y1 > 0.: f(x_best, *args)
     if checkiter: utils.raise_iter_error()
     return x_best
 
@@ -179,6 +180,6 @@ def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
             if checkroot and ytol_satisfied and xtol_satisfied: return x
             else: checkiter = False; break
         x = utils.IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, x)
-    if x_best != x: f(x, *args)
+    if x_best != x and y0 * y1 > 0.: f(x_best, *args)
     if checkiter: utils.raise_iter_error()
     return x_best
