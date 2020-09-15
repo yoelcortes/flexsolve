@@ -235,18 +235,14 @@ def roots_test_3(x, fixedpoint=False):
 
 julia_problems = test_problems[-3:]
 
-
 def test_scalar_solvers():
     summary_values = np.array(
         [[68, 66, 51, 42],
          [ 9, 11, 26, 35],
          [ 6,  8, 13, 18]]
     )
-    df_summary = test_problems.summary_df(solvers,
-                                          tol=1e-10,
-                                          solver_kwargs=kwargs,
-                                          solver_names=solver_names)
-    assert np.allclose(df_summary.values, summary_values)
+    summary_array = test_problems.summary_array(solvers, tol=1e-10, solver_kwargs=kwargs)
+    assert np.allclose(summary_array, summary_values)
    
 @pytest.mark.numba
 def test_scalar_solvers_with_numba():
