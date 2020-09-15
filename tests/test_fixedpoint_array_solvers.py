@@ -6,7 +6,6 @@ regarding chemical recycle loops with reactions.
 """
 import numpy as np
 import flexsolve as flx
-from matplotlib import pyplot as plt
 from numpy import allclose
 
 conversion = 0.8
@@ -26,6 +25,7 @@ def f(x):
     return effluent - product
 
 def create_plot(p, line=False):
+    from matplotlib import pyplot as plt
     xs = np.array(p.xs)
     ys = np.array(p.ys)
     xs = np.abs(xs).sum(0)
