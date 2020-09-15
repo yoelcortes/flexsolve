@@ -1,3 +1,4 @@
 pytest-cov
+numba
 coveralls
 pyglet
