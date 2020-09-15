@@ -8,7 +8,7 @@ compiler:
   - "3.8"
 branches:
   only:
-  - release
+  - master
 matrix:
   fast_finish: true
 notifications:
