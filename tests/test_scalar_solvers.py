@@ -11,6 +11,7 @@ from math import log, exp, erf, pi, sin, cos
 from numba import njit
 import numpy as np
 import flexsolve as flx
+import pytest
 
 flx.speed_up()
 fixedpoint_solvers = [flx.wegstein, flx.aitken]
@@ -247,6 +248,7 @@ def test_scalar_solvers():
                                           solver_names=solver_names)
     assert np.allclose(df_summary.values, summary_values)
    
+@pytest.mark.numba
 def test_scalar_solvers_with_numba():
     # This test takes about 15 sec because we are compiling 
     # every solver-problem version. There is no way to cache all these

@@ -7,6 +7,12 @@ flexsolve: Flexible function solvers
 .. image:: http://img.shields.io/pypi/v/flexsolve.svg?style=flat
    :target: https://pypi.python.org/pypi/flexsolve
    :alt: Version_status
+.. image:: https://img.shields.io/pypi/pyversions/flexsolve.svg
+   :target: https://pypi.python.org/pypi/flexsolve
+   :alt: Supported_versions
+.. image:: https://travis-ci.com/yoelcortes/flexsolve.svg?branch=master
+   :target: https://travis-ci.com/yoelcortes/flexsolve
+
 
 .. contents::
 
