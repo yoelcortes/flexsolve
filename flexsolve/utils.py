@@ -20,6 +20,16 @@ np.seterr(divide='raise', invalid='raise')
 
 @njitable(cache=True)
 def pick_best_solution(xys):
+    """
+    Return the value of x where abs(y) is at its minimum and xys is a list of
+    x-y pairs.
+    
+    Examples
+    --------
+    >>> pick_best_solution([(0.1, 0.3), (0.2, -1.), (-0.5, 0.001)])
+    -0.5
+    
+    """
     y_best = 1e16
     x_best = 0.
     abs_ = abs
@@ -158,19 +168,19 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
     return x
 
 @njitable(cache=True)
-def raise_iter_error():
+def raise_iter_error(): # pragma: no cover
     raise RuntimeError('maximum number of iterations exceeded; root could not be solved')
         
 @njitable(cache=True)
-def raise_tol_error():
+def raise_tol_error(): # pragma: no cover
     raise RuntimeError('minimum tolerance reached; root could not be solved')
 
 @njitable(cache=True)
-def check_tols(xtol, ytol):        
+def check_tols(xtol, ytol): # pragma: no cover
     if xtol <= 0. or ytol <= 0.:
         raise ValueError("xtol and ytol must be postive to check root")
 
 @njitable(cache=True)
-def check_bounds(y0, y1):        
+def check_bounds(y0, y1): # pragma: no cover
     if y0 * y1 > 0.:
         raise ValueError('f(x0) and f(x1) must have opposite signs')

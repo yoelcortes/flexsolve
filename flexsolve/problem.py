@@ -11,7 +11,7 @@ __all__ = ('Problem',)
 
 fixedpoint_solvers = [wegstein, aitken]
 
-class Problem:
+class Problem: # pragma: no cover
     __slots__ = ('f', 'cases')
     
     def __init__(self, f, cases):

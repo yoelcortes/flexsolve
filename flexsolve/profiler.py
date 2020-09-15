@@ -11,13 +11,13 @@ __all__ = ('Profiler',)
      
 plt = None
 
-def _load_matplotlib():
+def _load_matplotlib(): # pragma: no cover
     global plt
     if not plt:
         import matplotlib.pyplot as plt       
     
             
-class Archive:
+class Archive: # pragma: no cover
     __slots__ = ('name', 'xs', 'ys')
     
     def __init__(self, name, xs, ys):
@@ -59,7 +59,7 @@ class Archive:
               ")")
 
 
-class Profiler:
+class Profiler: # pragma: no cover
     __slots__ = ('f', 'xs', 'ys', 'active_archives', 'passed_cases', 'failed_cases')
     def __init__(self, f):
         self.f = f

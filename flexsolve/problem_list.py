@@ -10,12 +10,12 @@ import numpy as np
 __all__ = ('ProblemList',)
 
 pd = None
-def _load_pandas():
+def _load_pandas(): # pragma: no cover
     global pd
     if not pd:
         import pandas as pd
 
-class ProblemList(list):
+class ProblemList(list): # pragma: no cover
     
     def __getitem__(self, index):
         items = super().__getitem__(index)

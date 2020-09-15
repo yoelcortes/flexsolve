@@ -31,7 +31,7 @@ def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
             x1 = f(x0, *args)
         else:
             try: x1 = f(x0, *args)
-            except:
+            except: # pragma: no cover
                 x0 = x1
                 x1 = f(x0)
         if (np.abs(x1 - x0) < xtol).all(): return x1
@@ -58,6 +58,7 @@ def conditional_fixed_point(f, x):
     while condition:
         x1, condition = f(x0)
         x0 = x1
+    return x1
 
 @register_jitable(cache=True)
 def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
@@ -68,7 +69,7 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     for iter in range(maxiter):
         dx = x1 - x0
         try: g1 = f(x1, *args)
-        except:
+        except: # pragma: no cover
             x1 = g0
             g1 = f(x1, *args)
         if utils.fixedpoint_converged(g1 - x1, xtol): return g1
@@ -87,7 +88,7 @@ def conditional_wegstein(f, x):
     wegstein_iter = utils.wegstein_iter
     while condition:
         try: g1, condition = f(x1)
-        except:
+        except: # pragma: no cover
             x1 = g1
             g1, condition = f(x1)
         g1 = g1
@@ -95,6 +96,7 @@ def conditional_wegstein(f, x):
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
+    return x1
 
 @register_jitable(cache=True)
 def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
@@ -103,7 +105,7 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
     aitken_iter = utils.aitken_iter
     for iter in range(maxiter):
         try: g = f(x, *args)
-        except:
+        except: # pragma: no cover
             x = gg
             g = f(x, *args)
         dxg = x - g
@@ -124,10 +126,10 @@ def conditional_aitken(f, x):
     while condition:
         try:
             g, condition = f(x)
-        except:
+        except: # pragma: no cover
             x = gg.copy()
             g, condition = f(x)
         if not condition: return g
         gg, condition = f(g)
         x = aitken_iter(x, gg, x - g, gg - g)
-        
+    return x

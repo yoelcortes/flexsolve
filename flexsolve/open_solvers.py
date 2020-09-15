@@ -32,7 +32,7 @@ def secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
             return IQ_interpolation(f, xi0, x1, y0, y1, None,
                                     xtol, ytol, args, maxiter-iter,
                                     checkroot, checkiter, False)
-        if y1 == y0:
+        if y1 == y0: # pragma: no cover
             if checkroot or checkiter: utils.raise_tol_error()
             else: return x1
         xi0 = x1
@@ -63,7 +63,7 @@ def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
             if checkroot and ytol_satisfied and xtol_satisfied: return x1
             else: return x1
         inbounds = y1*y0 < 0.
-        if y1 == y0:
+        if y1 == y0: # pragma: no cover
             if inbounds:
                 return IQ_interpolation(f, x0, x1, y0, y1, None,
                                         xtol, ytol, args, maxiter-iter,
@@ -87,7 +87,7 @@ def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
             if checkroot and ytol_satisfied and xtol_satisfied: return x0
             else: return x0
         inbounds = y1*y0 < 0.
-        if y1 == y0:
+        if y1 == y0: # pragma: no cover
             if inbounds:
                 return IQ_interpolation(f, x1, x0, y0, y1, None,
                                         xtol, ytol, args, maxiter-iter,

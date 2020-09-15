@@ -13,7 +13,6 @@ import numpy as np
 import flexsolve as flx
 import pytest
 
-flx.speed_up()
 fixedpoint_solvers = [flx.wegstein, flx.aitken]
 open_solvers = [flx.secant, flx.aitken_secant] 
 solvers = open_solvers + fixedpoint_solvers
@@ -236,6 +235,7 @@ def roots_test_3(x, fixedpoint=False):
 julia_problems = test_problems[-3:]
 
 def test_scalar_solvers():
+    flx.speed_up()
     summary_values = np.array(
         [[68, 66, 51, 42],
          [ 9, 11, 26, 35],
@@ -244,7 +244,7 @@ def test_scalar_solvers():
     summary_array = test_problems.summary_array(solvers, tol=1e-10, solver_kwargs=kwargs)
     assert np.allclose(summary_array, summary_values)
    
-@pytest.mark.numba
+@pytest.mark.slow
 def test_scalar_solvers_with_numba():
     # This test takes about 15 sec because we are compiling 
     # every solver-problem version. There is no way to cache all these

@@ -46,11 +46,6 @@ class LeastSquaresIteration:
             xs = np.array(guess_history, dtype=float).transpose()
             return compute_weighted_average_by_least_squares(A, xs)
     
-    def reset(self):
-        self.guess_history.clear()
-        self.error_history.clear()
-        self._counter = 0
-    
     @property
     def active(self):
         active = self._counter == self.N_activate
@@ -63,9 +58,5 @@ LstSqIter = LeastSquaresIteration
 def fake_least_squares_iter(x, fx): return fx
 
 def as_least_squares_iter(lstsq):
-    if lstsq: 
-        if not isinstance(lstsq, LstSqIter):
-            lstsq = LstSqIter()
-    else:
-        lstsq = fake_least_squares_iter
+    if lstsq and not isinstance(lstsq, LstSqIter): lstsq = LstSqIter()
     return lstsq
