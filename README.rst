@@ -12,6 +12,8 @@ flexsolve: Flexible function solvers
    :alt: Supported_versions
 .. image:: https://travis-ci.com/yoelcortes/flexsolve.svg?branch=master
    :target: https://travis-ci.com/yoelcortes/flexsolve
+.. image:: https://coveralls.io/repos/github/yoelcortes/flexsolve/badge.svg?branch=master
+   :target: https://coveralls.io/github/yoelcortes/flexsolve?branch=master
 
 
 .. contents::
