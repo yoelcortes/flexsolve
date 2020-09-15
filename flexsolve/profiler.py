@@ -5,11 +5,17 @@ Created on Wed Nov 20 23:09:53 2019
 @author: yoelr
 """
 import numpy as np
-import matplotlib.pyplot as plt
 from copy import copy
 
 __all__ = ('Profiler',)
-            
+     
+plt = None
+
+def _load_matplotlib():
+    if not plt:
+        global plt
+        import matplotlib.pyplot as plt       
+    
             
 class Archive:
     __slots__ = ('name', 'xs', 'ys')
@@ -107,6 +113,7 @@ class Profiler:
     def plot(self, title=None, args=(), markbounds=True,
              plot_outside_bounds=True, N=50, shade=True,
              remove_ticks=True):
+        _load_matplotlib()
         plt.figure()
         archives = self.active_archives
         archives.sort(key=lambda x: x.size)
