@@ -12,8 +12,8 @@ __all__ = ('Profiler',)
 plt = None
 
 def _load_matplotlib():
+    global plt
     if not plt:
-        global plt
         import matplotlib.pyplot as plt       
     
             
