@@ -5,10 +5,15 @@ Created on Thu Jun 25 22:50:56 2020
 @author: yrc2
 """
 from .problem import Problem
-import pandas as pd
 import numpy as np
 
 __all__ = ('ProblemList',)
+
+pd = None
+def _load_pandas():
+    global pd
+    if not pd:
+        import pandas as pd
 
 class ProblemList(list):
     
