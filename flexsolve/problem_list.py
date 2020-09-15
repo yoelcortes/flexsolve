@@ -37,6 +37,7 @@ class ProblemList(list):
         return {i.name: i.profile_solver(solver, tol, kwargs) for i in self}
         
     def results_df(self, solvers, tol, solver_kwargs=None, solver_names=None):
+        _load_pandas()
         solver_problem_profiles = [self.profiles_list(i, tol, j) for i,j in zip(solvers, solver_kwargs)]
         problem_names = [i.name for i in self]
         problem_fields = ['Iterations', 'Passed', 'Failed']
@@ -48,6 +49,7 @@ class ProblemList(list):
         return pd.DataFrame(data, columns=columns, index=multi_index)
     
     def summary_df(self, solvers, tol, solver_kwargs=None, solver_names=None):
+        _load_pandas()
         problem_profiles = [self.profiles_list(i, tol, j) for i,j in zip(solvers, solver_kwargs)]
         passed_cases = [sum([len(i.passed_cases) for i in j]) for j in problem_profiles]
         failed_cases = [sum([len(i.failed_cases) for i in j]) for j in problem_profiles]
