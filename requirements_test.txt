@@ -2,4 +2,3 @@ pytest-cov
 numba
 coveralls
 pyglet
-scipy

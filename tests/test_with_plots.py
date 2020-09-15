@@ -4,12 +4,12 @@ Created on Sun Apr 19 17:12:04 2020
 
 @author: yoelr
 """
-import flexsolve as flx 
-from scipy import optimize as opt
 
 # %% Profile solvers
 
 if __name__ == '__main__':
+    import flexsolve as flx 
+    from scipy import optimize as opt
     x0, x1 = [-5, 5]
     f = lambda x: x**3 - 40 + 2*x 
     p = flx.Profiler(f)
