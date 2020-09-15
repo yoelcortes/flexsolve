@@ -33,3 +33,5 @@ from .least_squares_iteration import *
 from .problem_list import *
 from .problem import *
 from .profiler import *
+
+__version__ = '0.3.30'

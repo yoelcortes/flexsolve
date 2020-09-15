@@ -4,13 +4,13 @@ Created on Sat Nov 18 16:17:00 2017
 
 @author: Yoel Cortes-Pena
 """
-from setuptools import setup
+from distutils.core import setup
 
 setup(
     name='flexsolve',
     packages=['flexsolve'],
     license='MIT',
-    version='0.3.29',
+    version='0.3.30',
     description='Flexible function solvers',
     long_description=open('README.rst').read(),
     author='Yoel Cortes-Pena',
@@ -25,9 +25,23 @@ setup(
     classifiers=['Development Status :: 3 - Alpha',
                  'Environment :: Console',
                  'License :: OSI Approved :: MIT License',
+                 'Topic :: Education',
+                 'Topic :: Scientific/Engineering',
+                 'Topic :: Scientific/Engineering :: Mathematics',
+                 'Intended Audience :: Developers',
+                 'Intended Audience :: Education',
+                 'Intended Audience :: Manufacturing',
+                 'Intended Audience :: Science/Research',
+                 'Natural Language :: English',
+                 'Operating System :: MacOS',
+                 'Operating System :: Microsoft :: Windows',
+                 'Operating System :: POSIX',
+                 'Operating System :: POSIX :: BSD',
+                 'Operating System :: POSIX :: Linux',
+                 'Operating System :: Unix',
                  'Programming Language :: Python :: 3.6',
                  'Programming Language :: Python :: 3.7',
-                 'Topic :: Scientific/Engineering',
-                 'Topic :: Scientific/Engineering :: Mathematics'],
-    keywords='solve equation function flexible',
+                 'Programming Language :: Python :: 3.8',
+                 'Programming Language :: Python :: Implementation :: CPython']
+    keywords=['solve', 'equation', 'function', 'flexible'],
 )
