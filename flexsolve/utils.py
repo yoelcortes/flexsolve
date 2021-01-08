@@ -167,3 +167,30 @@ def check_tols(xtol, ytol): # pragma: no cover
 def check_bounds(y0, y1): # pragma: no cover
     if y0 * y1 > 0.:
         raise ValueError('f(x0) and f(x1) must have opposite signs')
+        
+@register_jitable(cache=True)
+def scalar_fixedpoint_converged(dx, xtol):
+    return dx < xtol
+
+@register_jitable(cache=True)
+def array_fixedpoint_converged(dx, xtol):
+    return (dx < xtol).all()
+
+def fixedpoint_converged(dx, xtol):
+    if isinstance(dx, Iterable) and dx.ndim:
+        return array_fixedpoint_converged(dx, xtol)
+    else:
+        return scalar_fixedpoint_converged(dx, xtol)
+
+@overload(fixedpoint_converged)
+def jit_fixedpoint_converged(dx, xtol):
+    if isinstance(dx, types.Array) and dx.ndim:
+        return array_fixedpoint_converged
+    else:
+        return scalar_fixedpoint_converged
+
+def scalar_mean(x): return x
+
+@overload(np.mean)
+def jit_mean(x):
+    return np.mean if isinstance(x, types.Array) and x.ndim else scalar_mean

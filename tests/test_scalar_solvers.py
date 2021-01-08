@@ -276,7 +276,7 @@ def test_scalar_solvers_with_numba():
                 try:
                     x = solver(f, case, args=args, **kwargsi)
                     assert abs_(f(x)) <= 1e-10, "result not within tolerance"
-                except:
+                except Exception:
                     problem_failed = True
                     failed_cases += 1
                 else:

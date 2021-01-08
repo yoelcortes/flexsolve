@@ -51,17 +51,17 @@ def test_fixedpoint_array_solvers():
     assert_allclose(solution, real_solution)
     p.archive('Aitken')
     
-    solution = flx.fixed_point_lstsq(p, feed, xtol=5e-8, maxiter=200)
-    assert_allclose(feed, original_feed)
-    assert_allclose(solution, real_solution)
-    p.archive('Lstsq')
+    # solution = flx.fixed_point_lstsq(p, feed, xtol=5e-8, maxiter=200)
+    # assert_allclose(feed, original_feed)
+    # assert_allclose(solution, real_solution)
+    # p.archive('Lstsq')
     
     solution = flx.fixed_point(p, feed, xtol=5e-8, maxiter=200)
     assert_allclose(feed, original_feed)
     assert_allclose(solution, real_solution)
     p.archive('Fixed point')
     
-    assert p.sizes() == {'Wegstein': 5, 'Aitken': 5, 'Lstsq': 22, 'Fixed point': 194}
+    assert p.sizes() == {'Wegstein': 5, 'Aitken': 5, 'Fixed point': 194}
     
     flx.speed_up()
     solution = flx.wegstein(f, feed, xtol=5e-8)
