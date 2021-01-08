@@ -83,27 +83,6 @@ def scalar_wegstein_iter(x, dx, g1, g0):
     else:
         x = g1
     return x
-        
-@register_jitable(cache=True)
-def scalar_fixedpoint_converged(dx, xtol):
-    return abs(dx) < xtol
-
-@register_jitable(cache=True)
-def array_fixedpoint_converged(dx, xtol):
-    return (np.abs(dx) < xtol).all()
-
-def fixedpoint_converged(dx, xtol):
-    if isinstance(dx, Iterable) and dx.ndim:
-        return array_fixedpoint_converged(dx, xtol)
-    else:
-        return scalar_fixedpoint_converged(dx, xtol)
-
-@overload(fixedpoint_converged)
-def jit_fixedpoint_converged(dx, xtol):
-    if isinstance(dx, types.Array) and dx.ndim:
-        return array_fixedpoint_converged
-    else:
-        return scalar_fixedpoint_converged
 
 @register_jitable(cache=True)
 def array_aitken_iter(x, gg, dxg, dgg_g):
@@ -174,6 +153,10 @@ def raise_iter_error(): # pragma: no cover
 @njitable(cache=True)
 def raise_tol_error(): # pragma: no cover
     raise RuntimeError('minimum tolerance reached; root could not be solved')
+
+@njitable(cache=True)
+def raise_convergence_error(): # pragma: no cover
+    raise RuntimeError('objective function either oscillates or diverges from solution; root could not be solved')
 
 @njitable(cache=True)
 def check_tols(xtol, ytol): # pragma: no cover

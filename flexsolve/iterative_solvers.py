@@ -20,11 +20,12 @@ __all__ = ('fixed_point',
 ) 
 
 def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
-                      checkiter=True):
+                      checkiter=True, checkconvergence=True, convergenceiter=0):
     """The least-squares solution of a matrix of prior iterations is partially
     used to iteratively esmitate the root."""
     lstsq = as_least_squares_iter(lstsq)
     x0 = x1 = x
+    errors = np.zeros(convergenceiter)
     for iter in range(maxiter):
         if x0 is None:
             x0 = x1
@@ -34,18 +35,35 @@ def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
             except: # pragma: no cover
                 x0 = x1
                 x1 = f(x0)
-        if (np.abs(x1 - x0) < xtol).all(): return x1
+        if (np.abs(x1 - x0) < xtol).all(): return x
         x0 = lstsq(x0, x1)
+        if convergenceiter:
+            mean = e.mean()
+            if iter > convergenceiter and mean > errors.mean():
+                if checkconvergence: utils.raise_convergence_error()
+                else: return x0
+            errors = np.roll(errors, shift=1)
+            errors[-1] = mean
     if checkiter: utils.raise_iter_error()
     return x1
 
 @register_jitable(cache=True)
-def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
+def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
+                checkconvergence=True, convergenceiter=0):
     """Iterative fixed-point solver."""
     x0 = x1 = x
+    errors = np.zeros(convergenceiter)
     for iter in range(maxiter):
         x1 = f(x0, *args)
-        if (np.abs(x1 - x0) < xtol).all(): return x1
+        e = np.abs(x1 - x0)
+        if (e < xtol).all(): return x1
+        if convergenceiter:
+            mean = e.mean()
+            if iter > convergenceiter and mean > errors.mean():
+                if checkconvergence: utils.raise_convergence_error()
+                else: return x1
+            errors = np.roll(errors, shift=1)
+            errors[-1] = mean
         x0 = x1
     if checkiter: utils.raise_iter_error()
     return x1
@@ -61,8 +79,10 @@ def conditional_fixed_point(f, x):
     return x1
 
 @register_jitable(cache=True)
-def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
+def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
+             checkconvergence=True, convergenceiter=0):
     """Iterative Wegstein solver."""
+    errors = np.zeros(convergenceiter)
     x0 = x
     x1 = g0 = f(x0, *args)
     wegstein_iter = utils.wegstein_iter
@@ -72,10 +92,18 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
         except: # pragma: no cover
             x1 = g0
             g1 = f(x1, *args)
-        if utils.fixedpoint_converged(g1 - x1, xtol): return g1
+        e = g1 - x1
+        if (np.abs(e) < xtol).all(): return g1
         x0 = x1
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
+        if convergenceiter:
+            mean = e.mean()
+            if iter > convergenceiter and mean > errors.mean():
+                if checkconvergence: utils.raise_convergence_error()
+                else: return x1
+            errors = np.roll(errors, shift=1)
+            errors[-1] = mean
     if checkiter: utils.raise_iter_error()
     return x1
 
@@ -99,9 +127,11 @@ def conditional_wegstein(f, x):
     return x1
 
 @register_jitable(cache=True)
-def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
+def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
+           checkconvergence=True, convergenceiter=0):
     """Iterative Aitken solver."""
     gg = x
+    errors = np.zeros(convergenceiter)
     aitken_iter = utils.aitken_iter
     for iter in range(maxiter):
         try: g = f(x, *args)
@@ -109,11 +139,19 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True):
             x = gg
             g = f(x, *args)
         dxg = x - g
-        if utils.fixedpoint_converged(dxg, xtol): return g
+        e = np.abs(dxg)
+        if (e < xtol).all(): return g
         gg = f(g, *args)
         dgg_g = gg - g
-        if utils.fixedpoint_converged(dgg_g, xtol): return gg
+        if (np.abs(dgg_g) < xtol).all(): return gg
         x = aitken_iter(x, gg, dxg, dgg_g)
+        if convergenceiter:
+            mean = e.mean()
+            if iter > convergenceiter and mean > errors.mean():
+                if checkconvergence: utils.raise_convergence_error()
+                else: return x
+            errors = np.roll(errors, shift=1)
+            errors[-1] = mean
     if checkiter: utils.raise_iter_error()
     return x
 
