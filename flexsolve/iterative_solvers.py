@@ -40,7 +40,7 @@ __all__ = ('fixed_point',
 #         if fixedpoint_converged(e, xtol): return x
 #         x0 = lstsq(x0, x1)
 #         if convergenceiter:
-#             mean = np.mean(e)
+#             mean = utils.mean(e)
 #             if iter > convergenceiter and mean > errors.mean():
 #                 if checkconvergence: utils.raise_convergence_error()
 #                 else: return x0
@@ -61,7 +61,7 @@ def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
         e = np.abs(x1 - x0)
         if fixedpoint_converged(e, xtol): return x1
         if convergenceiter:
-            mean = np.mean(e)
+            mean = utils.mean(e)
             if iter > convergenceiter and mean > errors.mean():
                 if checkconvergence: utils.raise_convergence_error()
                 else: return x1
@@ -102,7 +102,7 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
         x1 = wegstein_iter(x1, dx, g1, g0)
         g0 = g1
         if convergenceiter:
-            mean = np.mean(e)
+            mean = utils.mean(e)
             if iter > convergenceiter and mean > errors.mean():
                 if checkconvergence: utils.raise_convergence_error()
                 else: return x1
@@ -151,7 +151,7 @@ def aitken(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
         if fixedpoint_converged(np.abs(dgg_g), xtol): return gg
         x = aitken_iter(x, gg, dxg, dgg_g)
         if convergenceiter:
-            mean = np.mean(e)
+            mean = utils.mean(e)
             if iter > convergenceiter and mean > errors.mean():
                 if checkconvergence: utils.raise_convergence_error()
                 else: return x

@@ -189,8 +189,12 @@ def jit_fixedpoint_converged(dx, xtol):
     else:
         return scalar_fixedpoint_converged
 
+def mean(x):
+    return np.mean(x) if isinstance(x, Iterable) and x.ndim else x
+
+@register_jitable(cache=True)
 def scalar_mean(x): return x
 
-@overload(np.mean)
+@overload(mean)
 def jit_mean(x):
     return np.mean if isinstance(x, types.Array) and x.ndim else scalar_mean
