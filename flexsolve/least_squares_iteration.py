@@ -19,7 +19,7 @@ def weighted_average(xs, weights):
     return xs @ weights
 
 def compute_weighted_average_by_least_squares(A, xs):
-    b = 1e-12 * np.ones(A.shape[0])
+    b = 1e-16 * np.ones(A.shape[0])
     weights = linalg.lstsq(A, b, None)[0]
     return weighted_average(xs, weights)
 
