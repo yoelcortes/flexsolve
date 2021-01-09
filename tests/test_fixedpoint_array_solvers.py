@@ -78,11 +78,6 @@ def test_fixedpoint_array_solvers():
     
     assert p.sizes() == {'Wegstein': 5, 'Aitken': 5, 'Lstsq': 22, 'Fixed point': 194}
     
-    flx.speed_up()
-    solution = flx.wegstein(f, feed, convergenceiter=4, xtol=5e-8)
-    assert_allclose(solution, real_solution)
-    solution = flx.aitken(f, feed, convergenceiter=4, xtol=5e-8)
-    assert_allclose(solution, real_solution)
   
 def test_fixedpoint_array_solvers2():
     original_feed = feed.copy()
@@ -95,6 +90,8 @@ def test_fixedpoint_array_solvers2():
         solution = flx.wegstein(f2, feed, convergenceiter=4, xtol=1e-8, maxiter=200)
     with pytest.raises(RuntimeError):
         solution = flx.wegstein(f2, feed, xtol=1e-8, maxiter=20)
+    with pytest.raises(RuntimeError):
+        solution = flx.aitken(f2, feed, convergenceiter=4, xtol=1e-8, maxiter=200)
         
     solution = flx.wegstein(p, feed, checkconvergence=False, convergenceiter=4, xtol=1e-8)
     p.archive('Wegstein early termination')
@@ -135,6 +132,13 @@ def test_fixedpoint_array_solvers2():
                          'Lstsq': 27, 'Lstsq early termination': 29, 
                          'Fixed point': 191, 'Fixed point early termination': 191}
   
+def test_fixedpoint_array_with_speed_up():
+    flx.speed_up()
+    solution = flx.wegstein(f, feed, convergenceiter=4, xtol=5e-8)
+    assert_allclose(solution, real_solution)
+    solution = flx.aitken(f, feed, convergenceiter=4, xtol=5e-8)
+    assert_allclose(solution, real_solution)
+    
 def test_conditional_fixedpoint_array_solvers():
     original_feed = feed.copy()
     

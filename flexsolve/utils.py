@@ -53,14 +53,14 @@ def aitken_iter(x, gg, dxg, dgg_g):
         return scalar_aitken_iter(x, gg, dxg, dgg_g)
 
 @overload(wegstein_iter)
-def jit_wegstein_iter(x, dx, g1, g0):
+def jit_wegstein_iter(x, dx, g1, g0):  # pragma: no cover
     if isinstance(x, types.Array) and x.ndim:
         return array_wegstein_iter  
     else:
         return scalar_wegstein_iter
 
 @overload(aitken_iter)
-def jit_aitken_iter(x, gg, dxg, dgg_g):
+def jit_aitken_iter(x, gg, dxg, dgg_g):  # pragma: no cover
     if isinstance(x, types.Array) and x.ndim:
         return array_aitken_iter
     else:
@@ -147,7 +147,7 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
     return x
 
 @njitable(cache=True)
-def raise_iter_error(): # pragma: no cover
+def raise_iter_error():
     raise RuntimeError('maximum number of iterations exceeded; root could not be solved')
         
 @njitable(cache=True)
@@ -155,7 +155,7 @@ def raise_tol_error(): # pragma: no cover
     raise RuntimeError('minimum tolerance reached; root could not be solved')
 
 @njitable(cache=True)
-def raise_convergence_error(): # pragma: no cover
+def raise_convergence_error():
     raise RuntimeError('objective function either oscillates or diverges from solution; root could not be solved')
 
 @njitable(cache=True)
@@ -183,7 +183,7 @@ def fixedpoint_converged(dx, xtol):
         return scalar_fixedpoint_converged(dx, xtol)
 
 @overload(fixedpoint_converged)
-def jit_fixedpoint_converged(dx, xtol):
+def jit_fixedpoint_converged(dx, xtol): # pragma: no cover
     if isinstance(dx, types.Array) and dx.ndim:
         return array_fixedpoint_converged
     else:
@@ -196,5 +196,5 @@ def mean(x):
 def scalar_mean(x): return x
 
 @overload(mean)
-def jit_mean(x):
+def jit_mean(x): # pragma: no cover
     return np.mean if isinstance(x, types.Array) and x.ndim else scalar_mean
