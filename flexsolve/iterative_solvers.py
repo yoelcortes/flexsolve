@@ -16,38 +16,38 @@ __all__ = ('fixed_point',
            'conditional_wegstein',
            'aitken',
            'conditional_aitken',
-           # 'fixed_point_lstsq',
+           'fixed_point_lstsq',
 ) 
 
-# def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
-#                       checkiter=True, checkconvergence=True, convergenceiter=0):
-#     """The least-squares solution of a matrix of prior iterations is partially
-#     used to iteratively esmitate the root."""
-#     lstsq = as_least_squares_iter(lstsq)
-#     x0 = x1 = x
-#     errors = np.zeros(convergenceiter)
-#     fixedpoint_converged = utils.fixedpoint_converged
-#     for iter in range(maxiter):
-#         if x0 is None:
-#             x0 = x1
-#             x1 = f(x0, *args)
-#         else:
-#             try: x1 = f(x0, *args)
-#             except: # pragma: no cover
-#                 x0 = x1
-#                 x1 = f(x0)
-#         e = np.abs(x1 - x0)
-#         if fixedpoint_converged(e, xtol): return x
-#         x0 = lstsq(x0, x1)
-#         if convergenceiter:
-#             mean = utils.mean(e)
-#             if iter > convergenceiter and mean > errors.mean():
-#                 if checkconvergence: utils.raise_convergence_error()
-#                 else: return x0
-#             errors = np.roll(errors, shift=1)
-#             errors[-1] = mean
-#     if checkiter: utils.raise_iter_error()
-#     return x1
+def fixed_point_lstsq(f, x, xtol=5e-8, args=(), maxiter=50, lstsq=True,
+                      checkiter=True, checkconvergence=True, convergenceiter=0):
+    """The least-squares solution of a matrix of prior iterations is partially
+    used to iteratively esmitate the root."""
+    lstsq = as_least_squares_iter(lstsq)
+    x0 = x1 = x
+    errors = np.zeros(convergenceiter)
+    fixedpoint_converged = utils.fixedpoint_converged
+    for iter in range(maxiter):
+        if x0 is None:
+            x0 = x1
+            x1 = f(x0, *args)
+        else:
+            try: x1 = f(x0, *args)
+            except: # pragma: no cover
+                x0 = x1
+                x1 = f(x0, *args)
+        e = np.abs(x1 - x0)
+        if fixedpoint_converged(e, xtol): return x1
+        x0 = lstsq(x0, x1)
+        if convergenceiter:
+            mean = utils.mean(e)
+            if iter > convergenceiter and mean > errors.mean():
+                if checkconvergence: utils.raise_convergence_error()
+                else: return x1
+            errors = np.roll(errors, shift=1)
+            errors[-1] = mean
+    if checkiter: utils.raise_iter_error()
+    return x1
 
 @register_jitable(cache=True)
 def fixed_point(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
