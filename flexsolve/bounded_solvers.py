@@ -13,14 +13,16 @@ __all__ = ('false_position', 'bisection',
 # %% Tools
 
 @register_jitable(cache=True)
-def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
+def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50, tol=5e-8):
     """
     Return a bracket within `x0` and `x1` where the objective function, `f`, is 
     certain to have a root.
     """
+    isfinite = np.isfinite
+    if isfinite(y0) and isfinite(y1): return (x0, x1, y0, y1)
     bisect = utils.bisect
     if y1 < 0.:  x1, y1, x0, y0 = x0, y0, x1, y1
-    isfinite = np.isfinite
+    abs_ = abs
     for iter in range(maxiter):
         x = bisect(x0, x1)
         y = f(x, *args)
@@ -30,6 +32,7 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50):
         else:
             x0 = x
             y0 = y
+        if abs_(x1 - x0) < tol: return (x0, x1, y0, y1)
         if isfinite(y0) and isfinite(y1): return (x0, x1, y0, y1)
     raise RuntimeError('failed to find bracket')
     
