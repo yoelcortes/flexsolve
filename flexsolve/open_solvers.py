@@ -16,12 +16,16 @@ def secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     """Secant solver."""
     if checkroot: utils.check_tols(xtol, ytol)
     if x1 is None:
-        x1 = x0 + (1e-5 if xtol < 1e-5 else 2 * xtol)
+        x1 = x0 + 1e-5
+    dx = x1 - x0
+    if 0. <= dx <= xtol:
+        x1 = x0 + 2 * xtol
+    elif -xtol <= dx < 0.:
+        x1 = x0 - 2 * xtol
     y0 = f(x0, *args)
     abs_ = abs
     if abs_(y0) < ytol: return x0
-    dx = x1-x0 
-    if abs(dx) < xtol:
+    if abs_(dx) < xtol:
         raise ValueError('the difference between guesses must be greater than xtol (i.e. abs(x1 - x0) > xtol)')
     xi0 = x0
     for iter in range(maxiter): 
@@ -52,12 +56,16 @@ def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     """Secant solver with Aitken acceleration."""
     if checkroot: utils.check_tols(xtol, ytol)
     if x1 is None:
-        x1 = x0 + (1e-5 if xtol < 1e-5 else xtol)
+        x1 = x0 + 1e-5
+    dx = x1 - x0
+    if 0. <= dx <= xtol:
+        x1 = x0 + 2 * xtol
+    elif -xtol <= dx < 0.:
+        x1 = x0 - 2 * xtol
     abs_ = abs
     y0 = f(x0, *args)
     if abs_(y0) < ytol: return x0
-    dx = x1-x0
-    if abs(dx) < xtol:
+    if abs_(dx) < xtol:
         raise ValueError('the difference between guesses must be greater than xtol (i.e. abs(x1 - x0) > xtol)')
     aitken_iter = utils.scalar_aitken_iter
     oscillating = False

@@ -126,10 +126,9 @@ def test_fixedpoint_array_solvers2():
     assert_allclose(feed, original_feed)
     assert_allclose(solution, real_solution2, rtol=1e-3)
     p.archive('Fixed point early termination')
-    
     assert p.sizes() == {'Wegstein': 60, 'Wegstein early termination': 18, 
                          'Aitken': 6801, 'Aitken early termination': 95,
-                         'Lstsq': 26, 'Lstsq early termination': 26, 
+                         'Lstsq': 27, 'Lstsq early termination': 27, 
                          'Fixed point': 191, 'Fixed point early termination': 191}
   
 def test_fixedpoint_array_with_speed_up():

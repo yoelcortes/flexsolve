@@ -140,8 +140,7 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
         df1_d02 = df1 / d02
         df2_d01 = df2 / d01
         x = x0*df1_d02*df2_d01 - x1*df0_d12*df2_d01 + x2*df0_d12*df1_d02    
-        if not_within_bounds(x, x0, x1):
-            x = bisect(x0, x1)
+        if not_within_bounds(x, x0, x1): x = bisect(x0, x1)
     else:
         x = false_position_iter(x0, x1, dx, y0, y1, df0, xlast)
     return x

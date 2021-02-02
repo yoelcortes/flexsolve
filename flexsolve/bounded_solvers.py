@@ -4,6 +4,7 @@ Created on Tue Jul  9 00:35:01 2019
 
 @author: yoelr
 """
+from typing import Callable, Iterable, Any, Tuple, Optional
 import numpy as np
 from numba.extending import register_jitable
 from . import utils
@@ -13,10 +14,19 @@ __all__ = ('false_position', 'bisection',
 # %% Tools
 
 @register_jitable(cache=True)
-def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50, tol=5e-8):
+def find_bracket(
+        f: Callable, 
+        x0: float,
+        x1: float,
+        y0: float=-np.inf, 
+        y1: float=np.inf,
+        args: Iterable[Any]=(),
+        maxiter: int=50,
+        tol: float=5e-8) -> Tuple[float, float, float, float]:
     """
     Return a bracket within `x0` and `x1` where the objective function, `f`, is 
-    certain to have a root.
+    certain to have a roo
+    
     """
     isfinite = np.isfinite
     if isfinite(y0) and isfinite(y1): return (x0, x1, y0, y1)
@@ -39,9 +49,20 @@ def find_bracket(f, x0, x1, y0=-np.inf, y1=np.inf, args=(), maxiter=50, tol=5e-8
 # %% Solvers
 
 @register_jitable(cache=True)
-def false_position(f, x0, x1, y0=None, y1=None, x=None,
-                   xtol=0., ytol=5e-8, args=(), maxiter=50,
-                   checkroot=False, checkiter=True, checkbounds=True):
+def false_position(
+        f: Callable,
+        x0: float, 
+        x1: float, 
+        y0: Optional[float]=None, 
+        y1: Optional[float]=None, 
+        x: Optional[float]=None,
+        xtol: float=0.,
+        ytol: float=5e-8,
+        args: Iterable[Any]=(), 
+        maxiter: int=50,
+        checkroot: bool=False, 
+        checkiter: bool=True, 
+        checkbounds: bool=True) -> float:
     """False position solver."""
     if checkroot: utils.check_tols(xtol, ytol)
     if x is None: x = 1e32
@@ -89,8 +110,20 @@ def false_position(f, x0, x1, y0=None, y1=None, x=None,
     return x_best
 
 @register_jitable(cache=True)
-def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
-              maxiter=50, checkroot=False, checkiter=True, checkbounds=True):
+def bisection(
+        f: Callable,
+        x0: float, 
+        x1: float, 
+        y0: Optional[float]=None, 
+        y1: Optional[float]=None, 
+        x: Optional[float]=None,
+        xtol: float=0.,
+        ytol: float=5e-8,
+        args: Iterable[Any]=(), 
+        maxiter: int=50,
+        checkroot: bool=False, 
+        checkiter: bool=True, 
+        checkbounds: bool=True) -> float:
     """Bisection solver."""
     if checkroot: utils.check_tols(xtol, ytol)
     if y0 is None: y0 = f(x0, *args)
@@ -135,9 +168,20 @@ def bisection(f, x0, x1, y0=None, y1=None, x=None, xtol=0., ytol=5e-8, args=(),
     return x_best
 
 @register_jitable(cache=True)
-def IQ_interpolation(f, x0, x1, y0=None, y1=None, x=None,
-                     xtol=0., ytol=5e-8, args=(), maxiter=50,
-                     checkroot=False, checkiter=True, checkbounds=True):
+def IQ_interpolation(
+        f: Callable,
+        x0: float, 
+        x1: float, 
+        y0: Optional[float]=None, 
+        y1: Optional[float]=None, 
+        x: Optional[float]=None,
+        xtol: float=0.,
+        ytol: float=5e-8,
+        args: Iterable[Any]=(), 
+        maxiter: int=50,
+        checkroot: bool=False, 
+        checkiter: bool=True, 
+        checkbounds: bool=True) -> float:
     """Inverse quadratic interpolation solver."""
     if checkroot: utils.check_tols(xtol, ytol)
     abs_ = abs
