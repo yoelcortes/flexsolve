@@ -27,8 +27,6 @@ def secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     y0 = f(x0, *args)
     abs_ = abs
     if abs_(y0) < ytol: return x0
-    if abs_(dx) < xtol:
-        raise ValueError('the difference between guesses must be greater than xtol (i.e. abs(x1 - x0) > xtol)')
     xi0 = x0
     for iter in range(maxiter): 
         y1 = f(x1, *args)
@@ -69,8 +67,6 @@ def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     abs_ = abs
     y0 = f(x0, *args)
     if abs_(y0) < ytol: return x0
-    if abs_(dx) < xtol:
-        raise ValueError('the difference between guesses must be greater than xtol (i.e. abs(x1 - x0) > xtol)')
     aitken_iter = utils.scalar_aitken_iter
     oscillating = False
     for iter in range(maxiter):
