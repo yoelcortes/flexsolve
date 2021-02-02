@@ -20,8 +20,10 @@ def secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     dx = x1 - x0
     if 0. <= dx <= xtol:
         x1 = x0 + 2 * xtol
+        dx = 2 * xtol
     elif -xtol <= dx < 0.:
         x1 = x0 - 2 * xtol
+        dx = -2 * xtol
     y0 = f(x0, *args)
     abs_ = abs
     if abs_(y0) < ytol: return x0
@@ -60,8 +62,10 @@ def aitken_secant(f, x0, x1=None, xtol=0., ytol=5e-8, args=(), maxiter=50,
     dx = x1 - x0
     if 0. <= dx <= xtol:
         x1 = x0 + 2 * xtol
+        dx = 2 * xtol
     elif -xtol <= dx < 0.:
         x1 = x0 - 2 * xtol
+        dx = -2 * xtol
     abs_ = abs
     y0 = f(x0, *args)
     if abs_(y0) < ytol: return x0
