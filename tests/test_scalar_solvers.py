@@ -244,46 +244,46 @@ def test_scalar_solvers():
     summary_array = test_problems.summary_array(solvers, tol=1e-10, solver_kwargs=kwargs)
     assert np.allclose(summary_array, summary_values)
    
-@pytest.mark.slow
-def test_scalar_solvers_with_numba():
-    # This test takes about 15 sec because we are compiling 
-    # every solver-problem version. There is no way to cache all these
-    # due to weakrefs (unless we use dill instead of pickle for numba).
-    summary_values = np.array(
-       [[10, 10,  6,  6],
-        [ 0,  0,  4,  4],
-        [ 0,  0,  2,  2]]
-    )
-    jitted_open_solvers = [njit(i) for i in open_solvers]
-    jitted_fixedpoint_solvers = [njit(i) for i in fixedpoint_solvers]
-    jitted_solvers = jitted_open_solvers + jitted_fixedpoint_solvers
-    results = np.zeros((3, len(jitted_solvers)))
-    abs_ = abs
-    for i, solver in enumerate(jitted_solvers):
-        failed_cases = 0
-        passed_cases = 0
-        failed_problems = 0
-        isfixedpoint = solver in jitted_fixedpoint_solvers
-        args = (isfixedpoint,)
-        kwargsi = kwargs[i]
-        for problem in julia_problems: # Only check a subset for numba
-            f = problem.f
-            problem_failed = False
-            for case in problem.cases:
-                if isfixedpoint:
-                    # More or less account f(x) = x instead of f(x) = 0
-                    case = f(case) - case 
-                try:
-                    x = solver(f, case, args=args, **kwargsi)
-                    assert abs_(f(x)) <= 1e-10, "result not within tolerance"
-                except Exception:
-                    problem_failed = True
-                    failed_cases += 1
-                else:
-                    passed_cases += 1
-            failed_problems += problem_failed
-        results[:, i] = [passed_cases, failed_cases, failed_problems]
-    assert np.allclose(results, summary_values) 
+# @pytest.mark.slow
+# def test_scalar_solvers_with_numba():
+#     # This test takes about 15 sec because we are compiling 
+#     # every solver-problem version. There is no way to cache all these
+#     # due to weakrefs (unless we use dill instead of pickle for numba).
+#     summary_values = np.array(
+#        [[10, 10,  6,  6],
+#         [ 0,  0,  4,  4],
+#         [ 0,  0,  2,  2]]
+#     )
+#     jitted_open_solvers = [njit(i) for i in open_solvers]
+#     jitted_fixedpoint_solvers = [njit(i) for i in fixedpoint_solvers]
+#     jitted_solvers = jitted_open_solvers + jitted_fixedpoint_solvers
+#     results = np.zeros((3, len(jitted_solvers)))
+#     abs_ = abs
+#     for i, solver in enumerate(jitted_solvers):
+#         failed_cases = 0
+#         passed_cases = 0
+#         failed_problems = 0
+#         isfixedpoint = solver in jitted_fixedpoint_solvers
+#         args = (isfixedpoint,)
+#         kwargsi = kwargs[i]
+#         for problem in julia_problems: # Only check a subset for numba
+#             f = problem.f
+#             problem_failed = False
+#             for case in problem.cases:
+#                 if isfixedpoint:
+#                     # More or less account f(x) = x instead of f(x) = 0
+#                     case = f(case) - case 
+#                 try:
+#                     x = solver(f, case, args=args, **kwargsi)
+#                     assert abs_(f(x)) <= 1e-10, "result not within tolerance"
+#                 except Exception:
+#                     problem_failed = True
+#                     failed_cases += 1
+#                 else:
+#                     passed_cases += 1
+#             failed_problems += problem_failed
+#         results[:, i] = [passed_cases, failed_cases, failed_problems]
+#     assert np.allclose(results, summary_values) 
    
 if __name__ == '__main__':
     df_results = test_problems.results_df(solvers,

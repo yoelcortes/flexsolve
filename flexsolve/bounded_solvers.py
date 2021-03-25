@@ -18,32 +18,53 @@ def find_bracket(
         f: Callable, 
         x0: float,
         x1: float,
-        y0: float=-np.inf, 
-        y1: float=np.inf,
+        y0: float=None, 
+        y1: float=None,
         args: Iterable[Any]=(),
         maxiter: int=50,
         tol: float=5e-8) -> Tuple[float, float, float, float]:
     """
-    Return a bracket within `x0` and `x1` where the objective function, `f`, is 
-    certain to have a roo
+    Return a bracket where the objective function, `f`, is 
+    certain to have a root.
     
     """
+    if y0 is None: y0 = f(x0, *args)
+    if y1 is None: y1 = f(x1, *args)
     isfinite = np.isfinite
-    if isfinite(y0) and isfinite(y1): return (x0, x1, y0, y1)
-    bisect = utils.bisect
-    if y1 < 0.:  x1, y1, x0, y0 = x0, y0, x1, y1
     abs_ = abs
+    bisect = utils.bisect
     for iter in range(maxiter):
-        x = bisect(x0, x1)
-        y = f(x, *args)
-        if y > 0.:
-            x1 = x
-            y1 = y
-        else:
-            x0 = x
-            y0 = y
-        if abs_(x1 - x0) < tol: return (x0, x1, y0, y1)
-        if isfinite(y0) and isfinite(y1): return (x0, x1, y0, y1)
+        if y1 < y0: x1, y1, x0, y0 = x0, y0, x1, y1
+        dx = x1 - x0 
+        if isfinite(y0) and isfinite(y1):
+            if y0 * y1 <= 0: return (x0, x1, y0, y1)
+            if abs_(dx) < tol: return (x0, x1, y0, y1)
+            if y1 != y0:
+                x = x0 - 2. * y1*dx/(y1-y0)
+                y = f(x, *args)
+                if y1 < y < 0.:
+                    y1 = y
+                    x1 = x
+                    continue
+                elif y < y0 < 0:
+                    y0 = y
+                    x0 = x
+                    continue
+            if y1 < 0.:
+                x1 += 2. * dx
+                y1 = f(x1, *args)
+            elif y0 > 0.:
+                x0 -= 2. * dx
+                y0 = f(x0, *args)
+        else:                
+            x = bisect(x0, x1)
+            y = f(x, *args)
+            if y > 0.:
+                x1 = x
+                y1 = y
+            else:
+                x0 = x
+                y0 = y
     raise RuntimeError('failed to find bracket')
     
 # %% Solvers
