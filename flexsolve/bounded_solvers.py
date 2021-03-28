@@ -42,11 +42,11 @@ def find_bracket(
             if y1 != y0:
                 x = x0 - 2. * y1*dx/(y1-y0)
                 y = f(x, *args)
-                if y1 < y < 0.:
+                if y1 < y:
                     y1 = y
                     x1 = x
                     continue
-                elif y < y0 < 0:
+                elif y < y0:
                     y0 = y
                     x0 = x
                     continue
