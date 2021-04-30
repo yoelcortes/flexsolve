@@ -158,39 +158,28 @@ help us relate the points to the curve (not an actual interval):
 
 .. image:: https://raw.githubusercontent.com/yoelcortes/flexsolve/master/docs/images/fixed_point_solvers_example.png
 
-If your project is need for speed, you can speed up calculations in flexsolve
-using the **speed_up()** method, which works by `jit <https://numba.pydata.org/numba-doc/dev/index.html>`__
-compiling computationally-heavy algorithms in flexsolve. The following example benchmarks flexsolve's speed
-with and without compiling:
+If you have multiple layers of functions with solvers, you can speed up 
+calculations in flexsolve by JIT compiling them with `numba <https://numba.pydata.org/numba-doc/dev/index.html>`__.
+The following example benchmarks flexsolve's speed with and without compiling:
 
 .. code-block:: python
 
     >>> import flexsolve as flx
-    >>> f = lambda x: x**3 - 40 + 2*x 
-    >>> # Time solver without compiling
-    >>> %timeit flx.IQ_interpolation(f, -5, 5)
-    9.81 µs ± 131 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
-    >>> flx.speed_up() # This is the only line we need to run to speed up flexsolve
-    >>> # First run is slower because it need to compile
-    >>> x = flx.IQ_interpolation(f, -5, 5) 
-    >>> # Time solver after compiling
-    >>> %timeit flx.IQ_interpolation(f, -5, 5)
-    7.01 µs ± 88.4 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
-    
-It is also possible to use compiled flexsolve solvers as part of jit-compiled 
-code:
-
-.. code-block:: python
-
     >>> from numba import njit
-    >>> import flexsolve as flx
-    >>> flx.speed_up() # Not necessary if previous example was run
-    >>> f = njit(lambda x: x**3 - 40 + 2*x) # Must be jit compiled to run in other compiled code
-    >>> # For demonstration purposes, the high level compiled function is a silly one liner
-    >>> solve_x = njit(lambda: flx.IQ_interpolation(f, -5., 5.))
-    >>> x = solve_x() # First run is slow because it needs to compile
-    >>> %timeit solve_x()
-    139 ns ± 2.08 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)
+    >>> f = lambda x, y: x**3 - 40 + y*x 
+    >>> g = lambda y, z: y + flx.IQ_interpolation(f, -100, 100, args=(y,))
+    >>> h = lambda z: z - flx.IQ_interpolation(g, -10, 10, args=(z,))
+    >>> # Time solver without compiling
+    >>> %timeit flx.IQ_interpolation(h, -5, 15)
+    352 µs ± 5.6 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+    >>> f = njit(f)
+    >>> g = njit(g)
+    >>> h = njit(h)
+    >>> # First run is slower because it need to compile
+    >>> x = flx.IQ_interpolation(h, -5, 5) 
+    >>> # Time solver after compiling
+    >>> %timeit flx.IQ_interpolation(h, -5, 5)
+    4.32 µs ± 79.4 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
     
 The iterative methods for solving f(x) = x (e.g. fixed-point, Wegstain, Aitken) are 
 capable of solving multi-dimensional problems. Simply make sure x is an array 

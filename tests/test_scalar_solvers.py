@@ -235,7 +235,6 @@ def roots_test_3(x, fixedpoint=False):
 julia_problems = test_problems[-3:]
 
 def test_scalar_solvers():
-    flx.speed_up()
     summary_values = np.array(
         [[68, 66, 51, 42],
          [ 9, 11, 26, 35],
