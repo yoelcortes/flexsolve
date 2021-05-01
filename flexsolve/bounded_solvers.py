@@ -5,11 +5,15 @@ Created on Tue Jul  9 00:35:01 2019
 @author: yoelr
 """
 from typing import Callable, Iterable, Any, Tuple, Optional
-import numpy as np
 from numba.extending import register_jitable
+import numpy as np
 from . import utils
-__all__ = ('false_position', 'bisection', 
-           'IQ_interpolation', 'find_bracket')
+__all__ = (
+    'false_position', 
+    'bisection', 
+    'IQ_interpolation', 
+    'find_bracket'
+)
 
 # %% Tools
 
@@ -67,6 +71,7 @@ def find_bracket(
                 y0 = y
     raise RuntimeError('failed to find bracket')
     
+    
 # %% Solvers
 
 @register_jitable(cache=True)
@@ -91,14 +96,6 @@ def false_position(
     if y1 is None: y1 = f(x1, *args)
     if y1 < 0.:  x1, y1, x0, y0 = x0, y0, x1, y1
     abs_ = abs
-    err0 = abs_(y0)
-    err1 = abs_(y1)
-    if err0 < err1:
-        x_best = x0
-        err_best = err0
-    else:
-        x_best = x1
-        err_best = err1
     if checkbounds: utils.check_bounds(y0, y1)
     dx = x1 - x0
     df = - y0
@@ -116,19 +113,17 @@ def false_position(
             err = df = -y0
         else:
             return x
-        if err < err_best:
-            err_best = err
-            x_best = x
         dx = x1 - x0
         xtol_satisfied = abs_(dx) < xtol
         ytol_satisfied = err < ytol
-        if ytol_satisfied or xtol_satisfied: 
-            if checkroot and ytol_satisfied and xtol_satisfied: return x
-            else: checkiter = False; break
+        if checkroot:
+            if ytol_satisfied and xtol_satisfied:
+                return x
+        elif xtol_satisfied or ytol_satisfied:
+             return x
         x = false_position_iter(x0, x1, dx, y0, y1, df, x)
-    if x_best != x: f(x_best, *args)
     if checkiter: utils.raise_iter_error()
-    return x_best
+    return x
 
 @register_jitable(cache=True)
 def bisection(
@@ -152,14 +147,6 @@ def bisection(
     if y1 < 0.:  x1, y1, x0, y0 = x0, y0, x1, y1
     dx = x1 - x0
     abs_ = abs
-    err0 = abs_(y0)
-    err1 = abs_(y1)
-    if err0 < err1:
-        x_best = x0
-        err_best = err0
-    else:
-        x_best = x1
-        err_best = err1
     if checkbounds: utils.check_bounds(y0, y1)
     bisect = utils.bisect
     if x is None: x = bisect(x0, x1)
@@ -174,19 +161,17 @@ def bisection(
             err = -y
         else:
             return x
-        if err < err_best:
-            err_best = err
-            x_best = x
         dx = x1 - x0
         xtol_satisfied = abs_(dx) < xtol
         ytol_satisfied = err < ytol
-        if ytol_satisfied or xtol_satisfied: 
-            if checkroot and ytol_satisfied and xtol_satisfied: return x
-            else: checkiter = False; break
+        if checkroot:
+            if ytol_satisfied and xtol_satisfied:
+                return x
+        elif xtol_satisfied or ytol_satisfied:
+             return x
         x = bisect(x0, x1)
-    if x_best != x and y0 * y1 > 0.: f(x_best, *args)
     if checkiter: utils.raise_iter_error()
-    return x_best
+    return x
 
 @register_jitable(cache=True)
 def IQ_interpolation(
@@ -214,14 +199,6 @@ def IQ_interpolation(
     dx = x1 - x0
     if utils.not_within_bounds(x, x0, x1):
         x = utils.false_position_iter(x0, x1, dx, y0, y1, df0, x0)
-    err0 = abs_(y0)
-    err1 = abs_(y1)
-    if err0 < err1:
-        x_best = x0
-        err_best = err0
-    else:
-        x_best = x1
-        err_best = err1
     if checkbounds: utils.check_bounds(y0, y1)
     for iter in range(maxiter):
         y = f(x, *args)
@@ -238,16 +215,14 @@ def IQ_interpolation(
             err = df0 = -y
         else:
             return x
-        if err < err_best:
-            err_best = err
-            x_best = x
         dx = x1 - x0
         xtol_satisfied = abs_(dx) < xtol
         ytol_satisfied = err < ytol
-        if ytol_satisfied or xtol_satisfied: 
-            if checkroot and ytol_satisfied and xtol_satisfied: return x
-            else: checkiter = False; break
+        if checkroot:
+            if ytol_satisfied and xtol_satisfied:
+                return x
+        elif xtol_satisfied or ytol_satisfied:
+             return x
         x = utils.IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, x)
-    if x_best != x and y0 * y1 > 0.: f(x_best, *args)
     if checkiter: utils.raise_iter_error()
-    return x_best
+    return x

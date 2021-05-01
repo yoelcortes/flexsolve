@@ -4,10 +4,9 @@ Created on Mon Apr 20 16:41:04 2020
 
 @author: yoelr
 """
-from numba import njit
-from numba.extending import overload, register_jitable
+from numba import njit, types, float64 as f64
+from numba.extending import overload
 from collections.abc import Iterable
-from numba import types
 import numpy as np
 
 __all__ = ('pick_best_solution', 'wegstein_iter',
@@ -40,11 +39,49 @@ def pick_best_solution(xys):
             x_best = x
     return x_best
 
+# %% Fixed point iteration
+
+def mean(x):
+    return np.mean(x) if isinstance(x, Iterable) and x.ndim else x
+
+@njit(cache=True)
+def scalar_mean(x): return x
+
+@overload(mean)
+def jit_mean(x): # pragma: no cover
+    return np.mean if isinstance(x, types.Array) and x.ndim else scalar_mean
+
+# Fixed point
+
+def fixedpoint_converged(dx, xtol):
+    if isinstance(dx, Iterable) and dx.ndim:
+        return array_fixedpoint_converged(dx, xtol)
+    else:
+        return scalar_fixedpoint_converged(dx, xtol)
+
+@overload(fixedpoint_converged, jit_options=dict(cache=True))
+def jit_fixedpoint_converged(dx, xtol): # pragma: no cover
+    if isinstance(dx, types.Array) and dx.ndim:
+        return array_fixedpoint_converged
+    else:
+        return scalar_fixedpoint_converged
+
+@njit(f64(f64, f64), cache=True)
+def scalar_fixedpoint_converged(dx, xtol):
+    return dx < xtol
+
+@njit(cache=True)
+def array_fixedpoint_converged(dx, xtol):
+    return (dx < xtol).all()
+
+# Wegstein
+
 def wegstein_iter(x, dx, g1, g0):
     if isinstance(x, Iterable):
         return array_wegstein_iter(x, dx, g1, g0)
     else:
         return scalar_wegstein_iter(x, dx, g1, g0)
+
 @overload(wegstein_iter, jit_options=dict(cache=True))
 def jit_wegstein_iter(x, dx, g1, g0):  # pragma: no cover
     if isinstance(x, types.Array) and x.ndim:
@@ -52,28 +89,7 @@ def jit_wegstein_iter(x, dx, g1, g0):  # pragma: no cover
     else:
         return scalar_wegstein_iter
 
-def aitken_iter(x, gg, dxg, dgg_g):
-    if isinstance(x, Iterable):
-        return array_aitken_iter(x, gg, dxg, dgg_g)
-    else:
-        return scalar_aitken_iter(x, gg, dxg, dgg_g)
-@overload(aitken_iter, jit_options=dict(cache=True))
-def jit_aitken_iter(x, gg, dxg, dgg_g):  # pragma: no cover
-    if isinstance(x, types.Array) and x.ndim:
-        return array_aitken_iter
-    else:
-        return scalar_aitken_iter
-
-def array_wegstein_iter(x, dx, g1, g0):
-    denominator = dx-g1+g0
-    mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dx) < 1e16)
-    w = np.ones_like(dx)
-    w[mask] = dx[mask]/denominator[mask]
-    return w*g1 + (1.-w)*x
-@overload(array_wegstein_iter, jit_options=dict(cache=True))
-def jit_array_wegstein_iter(x, dx, g1, g0):
-    return array_wegstein_iter
-
+@njit(f64(f64, f64, f64, f64), cache=True)
 def scalar_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
     if abs(denominator) > 1e-16 and abs(dx) < 1e16:
@@ -82,16 +98,41 @@ def scalar_wegstein_iter(x, dx, g1, g0):
     else:
         x = g1
     return x
-@overload(scalar_wegstein_iter, jit_options=dict(cache=True))
-def jit_scalar_wegstein_iter(x, dx, g1, g0):
+
+@njit(cache=True)
+def array_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
-    if abs(denominator) > 1e-16 and abs(dx) < 1e16:
-        w = dx / denominator
-        x = w*g1 + (1.-w)*x
+    mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dx) < 1e16)
+    w = np.ones_like(dx)
+    w[mask] = dx[mask]/denominator[mask]
+    return w*g1 + (1.-w)*x
+
+# Aitken
+
+def aitken_iter(x, gg, dxg, dgg_g):
+    if isinstance(x, Iterable):
+        return array_aitken_iter(x, gg, dxg, dgg_g)
     else:
-        x = g1
+        return scalar_aitken_iter(x, gg, dxg, dgg_g)
+
+@overload(aitken_iter, jit_options=dict(cache=True))
+def jit_aitken_iter(x, gg, dxg, dgg_g):  # pragma: no cover
+    if isinstance(x, types.Array) and x.ndim:
+        return array_aitken_iter
+    else:
+        return scalar_aitken_iter
+
+
+@njit(f64(f64, f64, f64, f64), cache=True)
+def scalar_aitken_iter(x, gg, dxg, dgg_g):
+    denominator = dgg_g + dxg
+    if abs(denominator) > 1e-16 and abs(dxg) < 1e16:
+        x -= dxg**2. / denominator 
+    else:
+        x = gg
     return x
 
+@njit(cache=True)
 def array_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dxg) < 1e16)
@@ -100,47 +141,35 @@ def array_aitken_iter(x, gg, dxg, dgg_g):
     nmask = np.logical_not(mask)
     x[nmask] = gg[nmask]
     return x
-@overload(array_aitken_iter, jit_options=dict(cache=True))
-def jit_array_aitken_iter(x, gg, dxg, dgg_g):
-    return array_aitken_iter
 
-def scalar_aitken_iter(x, gg, dxg, dgg_g):
-    denominator = dgg_g + dxg
-    if abs(denominator) > 1e-16 and abs(dxg) < 1e16:
-        x -= dxg**2. / denominator 
-    else:
-        x = gg
-    return x
-@overload(scalar_aitken_iter, jit_options=dict(cache=True))
-def jit_scalar_aitken_iter(x, gg, dxg, dgg_g):
-    return scalar_aitken_iter
+# %% Bounded solvers
 
-@njit(cache=True)
+@njit(f64(f64, f64, f64), cache=True)
 def not_within_bounds(x, x0, x1):
     return not (x0 < x < x1 or x1 < x < x0)
 
-@njit(cache=True)
-def iteration_is_getting_stuck(x, xlast, dx, r=0.1):
+@njit(f64(f64, f64, f64, f64), cache=True)
+def iteration_is_getting_stuck(x, xlast, dx, r):
     return abs((x - xlast) / dx) < r
 
-@njit(cache=True)
+@njit(f64(f64, f64),cache=True)
 def bisect(x0, x1):
     return (x0 + x1) / 2.0
 
-@njit(cache=True)
+@njit(f64(f64, f64, f64, f64, f64, f64, f64), cache=True)
 def false_position_iter(x0, x1, dx, y0, y1, df, xlast):
     dy = y1 - y0
     if dy:
         x = x0 + df*dx/dy
         if not_within_bounds(x, x0, x1):
             x = bisect(x0, x1)
-        elif iteration_is_getting_stuck(x, xlast, dx):
+        elif iteration_is_getting_stuck(x, xlast, dx, 0.1):
             x = (x + x0 + x1) / 3.
     else:
         x = bisect(x0, x1)
     return x
 
-@njit(cache=True)
+@njit(f64(f64, f64, f64, f64, f64, f64, f64, f64, f64), cache=True)
 def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
     df1 = -y1
     df2 = -y2
@@ -178,34 +207,3 @@ def check_tols(xtol, ytol): # pragma: no cover
 def check_bounds(y0, y1): # pragma: no cover
     if y0 * y1 > 0.:
         raise ValueError('f(x0) and f(x1) must have opposite signs')
-        
-@njit(cache=True)
-def scalar_fixedpoint_converged(dx, xtol):
-    return dx < xtol
-
-@njit(cache=True)
-def array_fixedpoint_converged(dx, xtol):
-    return (dx < xtol).all()
-
-def fixedpoint_converged(dx, xtol):
-    if isinstance(dx, Iterable) and dx.ndim:
-        return array_fixedpoint_converged(dx, xtol)
-    else:
-        return scalar_fixedpoint_converged(dx, xtol)
-
-@overload(fixedpoint_converged, jit_options=dict(cache=True))
-def jit_fixedpoint_converged(dx, xtol): # pragma: no cover
-    if isinstance(dx, types.Array) and dx.ndim:
-        return array_fixedpoint_converged
-    else:
-        return scalar_fixedpoint_converged
-
-def mean(x):
-    return np.mean(x) if isinstance(x, Iterable) and x.ndim else x
-
-@njit(cache=True)
-def scalar_mean(x): return x
-
-@overload(mean)
-def jit_mean(x): # pragma: no cover
-    return np.mean if isinstance(x, types.Array) and x.ndim else scalar_mean
