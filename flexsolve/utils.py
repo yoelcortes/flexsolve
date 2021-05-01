@@ -102,10 +102,14 @@ def scalar_wegstein_iter(x, dx, g1, g0):
 @njit(cache=True)
 def array_wegstein_iter(x, dx, g1, g0):
     denominator = dx-g1+g0
-    mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dx) < 1e16)
-    w = np.ones_like(dx)
-    w[mask] = dx[mask]/denominator[mask]
-    return w*g1 + (1.-w)*x
+    x_new = x.copy()
+    for i in np.ndindex(x.shape):
+        dxi = dx[i]
+        di = denominator[i]
+        if np.abs(di) > 1e-16 and np.abs(dxi) < 1e16: 
+            w = dxi / di
+            x_new[i] = w * g1[i] + (1. - w) * x[i]
+    return x_new
 
 # Aitken
 
@@ -135,12 +139,13 @@ def scalar_aitken_iter(x, gg, dxg, dgg_g):
 @njit(cache=True)
 def array_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
-    mask = np.logical_and(np.abs(denominator) > 1e-16, np.abs(dxg) < 1e16)
-    x = x.copy()
-    x[mask] -= dxg[mask]**2./denominator[mask]
-    nmask = np.logical_not(mask)
-    x[nmask] = gg[nmask]
-    return x
+    x_new = gg.copy()
+    for i in np.ndindex(x.shape):
+        dxgi = dxg[i]
+        di = denominator[i]
+        if np.abs(di) > 1e-16 and np.abs(dxgi) < 1e16: 
+            x_new[i] = x[i] - dxgi * dxgi / di
+    return x_new
 
 # %% Bounded solvers
 
