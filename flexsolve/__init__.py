@@ -28,4 +28,4 @@ from .problem_list import *
 from .problem import *
 from .profiler import *
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'
