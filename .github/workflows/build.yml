@@ -57,10 +57,10 @@ jobs:
         pip install -r requirements_test.txt
     - name: Test with numba
       run: |
-        pytest . -v term-missing -m "not slow" --disable-numba='0'
+        pytest . -v --disable-numba='0'
     - name: Test without numba
       run: |
-        pytest . -v --cov-report html --cov=flexsolve --cov-report term-missing -m "not slow" --disable-numba='1'
+        pytest . -v --cov-report html --cov=flexsolve --cov-report --disable-numba='1'
       env:
             COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
             COVERALLS_PARALLEL: true
