@@ -34,7 +34,7 @@ class Problem: # pragma: no cover
         p = Profiler(f)
         for case in self.cases:
             if isfixedpoint: case = f(case) - case
-            try: 
+            try:
                 x = solver(p, case, **kwargs)
                 self.test(x, ytol, kwargs.get('args', ()))
             except: 

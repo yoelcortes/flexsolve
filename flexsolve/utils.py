@@ -191,7 +191,7 @@ def IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, xlast):
     return x
 
 @njit(cache=True)
-def raise_iter_error():
+def raise_iter_error(): # pragma: no cover 
     raise RuntimeError('maximum number of iterations exceeded; root could not be solved')
         
 @njit(cache=True)
@@ -199,7 +199,7 @@ def raise_tol_error(): # pragma: no cover
     raise RuntimeError('minimum tolerance reached; root could not be solved')
 
 @njit(cache=True)
-def raise_convergence_error():
+def raise_convergence_error(): # pragma: no cover 
     raise RuntimeError('objective function either oscillates or diverges from solution; root could not be solved')
 
 @njit(cache=True)

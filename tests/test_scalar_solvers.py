@@ -7,6 +7,7 @@
 # for license details.
 """
 """
+import os
 from math import log, exp, erf, pi, sin, cos
 from numba import njit
 import numpy as np
@@ -83,7 +84,7 @@ def camel(x, fixedpoint=False):
 
 @add_problem(cases=[2., 3.])
 def Wallis_example(x, fixedpoint=False):
-    y = x**3 - 2*x - 5
+    y = x*x*x - 2.*x - 5.
     return y + x if fixedpoint else y
 
 named_problems = test_problems[:]  
@@ -92,12 +93,12 @@ named_problems = test_problems[:]
 
 @add_problem(cases=[0.1])
 def zero_test_1(x, fixedpoint=False):
-    y = sin(x) - x/2
+    y = sin(x) - x/2.
     return y + x if fixedpoint else y
         
 @add_problem(cases=[1.])
 def zero_test_2(x, fixedpoint=False):
-    y = 2*x - exp(-x)
+    y = 2.*x - exp(-x)
     return y + x if fixedpoint else y
         
 @add_problem(cases=[1.])
@@ -107,22 +108,23 @@ def zero_test_3(x, fixedpoint=False):
 
 @add_problem(cases=[1.])
 def zero_test_4(x, fixedpoint=False):
-    y = exp(x) - 1.0/(10.0*x)**2
+    a = (10.0*x)
+    y = exp(x) - 1.0/(a*a)
     return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
 def zero_test_5(x, fixedpoint=False):
-    y = (x+3)*(x-1)**2
+    y = (x+3.)*(x-1.)**2.
     return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
 def zero_test_6(x, fixedpoint=False):
-    y = exp(x) - 2 - 1/(10*x)**2 + 2/(100*x)**3
+    y = exp(x) - 2. - 1./(10.*x)**2. + 2./(100.*x)**3.
     return y + x if fixedpoint else y
        
 @add_problem(cases=[1.])
 def zero_test_7(x, fixedpoint=False):
-    y = x**3
+    y = x*x*x
     return y + x if fixedpoint else y
 
 @add_problem(cases=[1.])
@@ -176,7 +178,7 @@ def scipy_GH8904(x, fixedpoint=False):
         
 @add_problem(cases=[0., 0.5])
 def scipy_GH8881(x, fixedpoint=False):
-    y = x**(1.00/9.0) - 9**(1.0/9)
+    y = x**(1.00/9.0) - 9**(1.0/9.)
     return y + x if fixedpoint else y
         
 scipy_problems = test_problems[-7:]
@@ -193,9 +195,9 @@ def gsl_test_2(x, fixedpoint=False):
     y = cos(x)
     return y + x if fixedpoint else y
         
-@add_problem(cases=[0.1, 2])
+@add_problem(cases=[0.1, 2.])
 def gsl_test_3(x, fixedpoint=False):
-    y = x**20 - 1
+    y = x**20. - 1.
     return y + x if fixedpoint else y
 
 @add_problem(cases=[-1.0/3, 1])
@@ -205,12 +207,12 @@ def gsl_test_4(x, fixedpoint=False):
 
 @add_problem(cases=[0, 1])
 def gsl_test_5(x, fixedpoint=False):
-    y = x**2 - 1e-8
+    y = x*x - 1e-8
     return y + x if fixedpoint else y
         
 @add_problem(cases=[0.9995, 1.0002])
 def gsl_test_6(x, fixedpoint=False):
-    y = (x-1.0)**7
+    y = (x-1.0)**7.
     return y + x if fixedpoint else y
 
 gsl_problems = test_problems[-6:]
@@ -222,24 +224,31 @@ def roots_test_1(x, fixedpoint=False):
     y = abs(x - 0.0)
     return y + x if fixedpoint else y
 
-@add_problem(cases=[0, -1, 1, 21])
+@add_problem(cases=[0, -1, 1., 21.])
 def roots_test_2(x, fixedpoint=False):
-    y = 1024*x**11 - 2816*x**9 + 2816*x**7 - 1232*x**5 + 220*x**3 - 11*x
+    y = 1024.*x**11. - 2816.*x**9. + 2816.*x**7. - 1232.*x**5. + 220.*x**3. - 11.*x
     return y + x if fixedpoint else y
 
 @add_problem(cases=[0, -1, 1, 7])
 def roots_test_3(x, fixedpoint=False):
-    y = 512*x**9 - 1024*x**7 + 672*x**5 - 160*x**3 +10*x
+    y = 512.*x**9. - 1024.*x**7. + 672.*x**5. - 160.*x**3. +10.*x
     return y + x if fixedpoint else y
 
 julia_problems = test_problems[-3:]
 
 def test_scalar_solvers():
-    summary_values = np.array(
-        [[68, 66, 51, 42],
-         [ 9, 11, 26, 35],
-         [ 6,  8, 13, 18]]
-    )
+    if os.environ.get("NUMBA_DISABLE_JIT") == '1':
+        summary_values = np.array(
+            [[67, 66, 53, 44],
+             [10, 11, 24, 33],
+             [ 7,  8, 12, 17]]
+        )
+    else:
+        summary_values = np.array(
+            [[68, 66, 51, 42],
+             [ 9, 11, 26, 35],
+             [ 6,  8, 13, 18]]
+        )
     summary_array = test_problems.summary_array(solvers, tol=1e-10, solver_kwargs=kwargs)
     assert np.allclose(summary_array, summary_values)
    

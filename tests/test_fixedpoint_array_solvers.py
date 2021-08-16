@@ -4,6 +4,8 @@ Test iterative methods using a chemical process engineering problem
 regarding chemical recycle loops with reactions.
 
 """
+import os
+os.environ["NUMBA_DISABLE_JIT"] = '1'
 from numba import njit
 import numpy as np
 import flexsolve as flx
@@ -112,9 +114,15 @@ def test_fixedpoint_array_solvers2():
     assert_allclose(feed, original_feed)
     assert_allclose(solution, real_solution2, rtol=1e-3)
     p.archive('Fixed point early termination')
-    assert p.sizes() == {'Wegstein': 61, 'Wegstein early termination': 18, 
-                         'Aitken': 392, 'Aitken early termination': 91,
-                         'Fixed point': 191, 'Fixed point early termination': 191}
+    if os.environ.get("NUMBA_DISABLE_JIT") == '1':
+        assert p.sizes() == {'Wegstein': 63, 'Wegstein early termination': 18, 
+                             'Aitken': 6801, 'Aitken early termination': 95, 
+                             'Fixed point': 191, 'Fixed point early termination': 191}
+    else:
+        assert p.sizes() == {'Wegstein': 61, 'Wegstein early termination': 18, 
+                             'Aitken': 392, 'Aitken early termination': 91,
+                             'Fixed point': 191, 'Fixed point early termination': 191}
+    
   
 def test_conditional_fixedpoint_array_solvers():
     original_feed = feed.copy()
