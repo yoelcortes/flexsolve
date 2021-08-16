@@ -5,7 +5,6 @@ regarding chemical recycle loops with reactions.
 
 """
 import os
-os.environ["NUMBA_DISABLE_JIT"] = '1'
 from numba import njit
 import numpy as np
 import flexsolve as flx
