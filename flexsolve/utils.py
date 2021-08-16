@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Apr 20 16:41:04 2020
-
 @author: yoelr
 """
 from numba import njit, types, float64 as f64
@@ -131,7 +130,7 @@ def jit_aitken_iter(x, gg, dxg, dgg_g):  # pragma: no cover
 def scalar_aitken_iter(x, gg, dxg, dgg_g):
     denominator = dgg_g + dxg
     if abs(denominator) > 1e-16 and abs(dxg) < 1e16:
-        x -= dxg**2. / denominator 
+        x -= dxg * dxg / denominator 
     else:
         x = gg
     return x
@@ -157,7 +156,7 @@ def not_within_bounds(x, x0, x1):
 def iteration_is_getting_stuck(x, xlast, dx, r):
     return abs((x - xlast) / dx) < r
 
-@njit(f64(f64, f64),cache=True)
+@njit(f64(f64, f64), cache=True)
 def bisect(x0, x1):
     return (x0 + x1) / 2.0
 

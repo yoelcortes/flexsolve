@@ -10,8 +10,6 @@ flexsolve: Flexible function solvers
 .. image:: https://img.shields.io/pypi/pyversions/flexsolve.svg
    :target: https://pypi.python.org/pypi/flexsolve
    :alt: Supported_versions
-.. image:: https://travis-ci.com/yoelcortes/flexsolve.svg?branch=master
-   :target: https://travis-ci.com/yoelcortes/flexsolve
 .. image:: https://coveralls.io/repos/github/yoelcortes/flexsolve/badge.svg?branch=master
    :target: https://coveralls.io/github/yoelcortes/flexsolve?branch=master
 

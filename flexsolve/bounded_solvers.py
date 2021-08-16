@@ -4,7 +4,7 @@ Created on Tue Jul  9 00:35:01 2019
 
 @author: yoelr
 """
-from typing import Callable, Iterable, Any, Tuple, Optional
+from typing import Callable, Any, Tuple, Optional
 from numba.extending import register_jitable
 import numpy as np
 from . import utils
@@ -24,7 +24,7 @@ def find_bracket(
         x1: float,
         y0: float=None, 
         y1: float=None,
-        args: Iterable[Any]=(),
+        args: Tuple[Any, ...]=(),
         maxiter: int=50,
         tol: float=5e-8) -> Tuple[float, float, float, float]:
     """
@@ -84,7 +84,7 @@ def false_position(
         x: Optional[float]=None,
         xtol: float=0.,
         ytol: float=5e-8,
-        args: Iterable[Any]=(), 
+        args: Tuple[Any, ...]=(), 
         maxiter: int=50,
         checkroot: bool=False, 
         checkiter: bool=True, 
@@ -135,7 +135,7 @@ def bisection(
         x: Optional[float]=None,
         xtol: float=0.,
         ytol: float=5e-8,
-        args: Iterable[Any]=(), 
+        args: Tuple[Any, ...]=(), 
         maxiter: int=50,
         checkroot: bool=False, 
         checkiter: bool=True, 
@@ -183,7 +183,7 @@ def IQ_interpolation(
         x: Optional[float]=None,
         xtol: float=0.,
         ytol: float=5e-8,
-        args: Iterable[Any]=(), 
+        args: Tuple[Any, ...]=(), 
         maxiter: int=50,
         checkroot: bool=False, 
         checkiter: bool=True, 
