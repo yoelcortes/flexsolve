@@ -191,17 +191,28 @@ def IQ_interpolation(
     """Inverse quadratic interpolation solver."""
     if checkroot: utils.check_tols(xtol, ytol)
     abs_ = abs
+    if x is None:
+        guess_x = True
+        x = 1e32
+    else:
+        guess_x = utils.not_within_bounds(x, x0, x1)
+        if not guess_x: 
+            y = f(x, *args)
+            if not checkroot and abs_(y) < ytol or y == 0: return x # Lucky guess
     if y0 is None: y0 = f(x0, *args)
+    if not checkroot and abs_(y0) < ytol or y0 == 0: return x0 # Lucky guess
     if y1 is None: y1 = f(x1, *args)
-    if x is None: x = 1e32
+    if not checkroot and abs_(y1) < ytol or y1 == 0: return x1 # Lucky guess
     if y1 < 0.: x1, y1, x0, y0 = x0, y0, x1, y1
     df0 = -y0
     dx = x1 - x0
-    if utils.not_within_bounds(x, x0, x1):
+    if guess_x:
         x = utils.false_position_iter(x0, x1, dx, y0, y1, df0, x0)
-    if checkbounds: utils.check_bounds(y0, y1)
-    for iter in range(maxiter):
         y = f(x, *args)
+        if not checkroot and abs_(y) < ytol or y == 0: return x # Lucky guess
+    if checkbounds: utils.check_bounds(y0, y1)
+    
+    for iter in range(maxiter):
         if y > 0.:
             y2 = y1
             x2 = x1
@@ -224,5 +235,6 @@ def IQ_interpolation(
         elif xtol_satisfied or ytol_satisfied:
              return x
         x = utils.IQ_iter(y0, y1, y2, x0, x1, x2, dx, df0, x)
+        y = f(x, *args)
     if checkiter: utils.raise_iter_error()
     return x
