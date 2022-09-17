@@ -206,12 +206,11 @@ def IQ_interpolation(
     if y1 < 0.: x1, y1, x0, y0 = x0, y0, x1, y1
     df0 = -y0
     dx = x1 - x0
+    if checkbounds: utils.check_bounds(y0, y1)
     if guess_x:
         x = utils.false_position_iter(x0, x1, dx, y0, y1, df0, x0)
         y = f(x, *args)
         if not checkroot and abs_(y) < ytol or y == 0: return x # Lucky guess
-    if checkbounds: utils.check_bounds(y0, y1)
-    
     for iter in range(maxiter):
         if y > 0.:
             y2 = y1
