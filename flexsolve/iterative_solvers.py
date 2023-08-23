@@ -15,6 +15,7 @@ __all__ = ('fixed_point',
            'conditional_wegstein',
            'aitken',
            'conditional_aitken',
+           'wegstein_loess',
 ) 
 
 @register_jitable(cache=True)
@@ -56,8 +57,10 @@ def wegstein(f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
     errors = np.zeros(convergenceiter)
     x0 = x
     x1 = g0 = f(x0, *args)
-    wegstein_iter = utils.wegstein_iter
     fixedpoint_converged = utils.fixedpoint_converged
+    e = np.abs(x1 - x0)
+    if fixedpoint_converged(e, xtol): return x1
+    wegstein_iter = utils.wegstein_iter
     for iter in range(maxiter):
         dx = x1 - x0
         try: g1 = f(x1, *args)
@@ -143,4 +146,47 @@ def conditional_aitken(f, x):
         if not condition: return g
         gg, condition = f(g)
         x = aitken_iter(x, gg, x - g, gg - g)
+    return x
+
+def wegstein_loess(
+        f, x, xtol=5e-8, args=(), maxiter=50, checkiter=True,
+        checkconvergence=True, weight=None, distance=None,
+    ):
+    """Iterative Wegstein solver that switches to locally weighted least squares
+    once enough evaluations have been reached."""
+    warmup_iter = len(x) + 2 if hasattr(x, '__len__') else 2
+    x0 = x
+    x1 = g0 = f(x0, *args)
+    fixedpoint_converged = utils.fixedpoint_converged
+    dx = x1 - x0
+    e = np.abs(dx)
+    loess = utils.FixedPointLOESS(weight)
+    loess.learn(x0, dx)
+    if fixedpoint_converged(e, xtol): return x1
+    wegstein_iter = utils.wegstein_iter
+    for iter in range(warmup_iter):
+        dx = x1 - x0
+        try: g1 = f(x1, *args)
+        except: # pragma: no cover
+            x1 = g0
+            g1 = f(x1, *args)
+        dgx = g1 - x1
+        e = np.abs(dgx)
+        loess.learn(x1, dgx)
+        if fixedpoint_converged(e, xtol): return g1
+        x0 = x1
+        x1 = wegstein_iter(x1, dx, g1, g0)
+        g0 = g1
+    x = x1
+    for iter in range(maxiter - warmup_iter):
+        try: g = f(x, *args)
+        except: # pragma: no cover
+            x = g
+            g = f(x, *args)
+        dxg = x - g
+        e = np.abs(dxg)
+        if fixedpoint_converged(e, xtol): return g
+        loess.learn(x, dxg)
+        x = loess.predict()
+    if checkiter: utils.raise_iter_error()
     return x

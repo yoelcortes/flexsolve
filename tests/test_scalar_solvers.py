@@ -14,11 +14,14 @@ import numpy as np
 import flexsolve as flx
 import pytest
 
-fixedpoint_solvers = [flx.wegstein, flx.aitken]
 open_solvers = [flx.secant, flx.aitken_secant] 
+fixedpoint_solvers = [flx.wegstein, flx.aitken, flx.wegstein_loess]
 solvers = open_solvers + fixedpoint_solvers
 solver_names = [i.__name__ for i in solvers]
-kwargs = [{'ytol': 1e-11}, {'ytol': 1e-11}, {'xtol': 1e-11}, {'xtol': 1e-11}]
+kwargs = [
+    *[{'ytol': 1e-11} for i in open_solvers],
+    *[{'xtol': 1e-11} for i in fixedpoint_solvers]
+]
 for i in kwargs: i['maxiter'] = 100
 test_problems = flx.ProblemList()
 def add_problem(f=None, **kwargs):

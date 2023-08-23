@@ -146,6 +146,48 @@ def array_aitken_iter(x, gg, dxg, dgg_g):
             x_new[i] = x[i] - dxgi * dxgi / di
     return x_new
 
+#  Locally weighted least squares
+
+class FixedPointLOESS:
+    __slots__ = ('xs', 'dxs', 'ws', 'weight')
+    
+    def __init__(self, weight=None):
+        if weight is None: weight = lambda x: 1 / (1e-16 + x)
+        self.weight = weight
+        self.xs = []
+        self.dxs = []
+        self.ws = []
+    
+    def learn(self, x, dx):
+        self.xs.append(x)
+        self.dxs.append(dx)
+        self.ws.append(
+            np.sqrt(
+                self.weight(np.sum(np.abs(dx)))
+            )
+        )
+    
+    def predict(self):
+        xs = np.array(self.xs)
+        dxs = np.array(self.dxs)
+        ws = np.array(self.ws)
+        n_original = xs.shape[1]
+        index = (np.abs(dxs) > 1e-16).all(axis=0)
+        xs = xs[:, index]
+        dxs = dxs[:, index]
+        n_parameters = index.shape[0]
+        betas = np.zeros([n_parameters, n_parameters])
+        for i in range(n_parameters):
+            betas[i, :] = fit_linear_model(ws[:, None] * xs, ws * dxs[:, i])
+        x = np.zeros(n_original)
+        x[index] = np.linalg.solve(betas, np.zeros(n_parameters))
+        return x
+
+@njit(cache=True)
+def fit_linear_model(X, y):
+    Xt = X.transpose()
+    return np.linalg.inv(Xt @ X) @ Xt @ y
+
 # %% Bounded solvers
 
 @njit(f64(f64, f64, f64), cache=True)
