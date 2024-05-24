@@ -52,9 +52,9 @@ def jit_mean(x): # pragma: no cover
 
 # Fixed point
 
-def fixedpoint_converged(dx, xtol):
+def fixedpoint_converged(dx, xtol, subset=0):
     if isinstance(dx, Iterable) and dx.ndim:
-        return array_fixedpoint_converged(dx, xtol)
+        return array_fixedpoint_converged(dx, xtol, subset)
     else:
         return scalar_fixedpoint_converged(dx, xtol)
 
@@ -70,8 +70,11 @@ def scalar_fixedpoint_converged(dx, xtol):
     return dx < xtol
 
 @njit(cache=True)
-def array_fixedpoint_converged(dx, xtol):
-    return (dx < xtol).all()
+def array_fixedpoint_converged(dx, xtol, subset):
+    if subset:
+        return (dx[:subset] < xtol).all()
+    else:
+        return (dx < xtol).all()
 
 # Wegstein
 
