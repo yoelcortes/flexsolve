@@ -15,7 +15,7 @@ setup(
     long_description=open('README.rst').read(),
     author='Yoel Cortes-Pena',
     install_requires=['numba>=0.50.0', 'llvmlite>=0.31', 'numpy'],
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     package_data=
         {'flexsolve': []},
     platforms=['Windows', 'Mac', 'Linux'],
