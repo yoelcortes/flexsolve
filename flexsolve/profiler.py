@@ -72,7 +72,10 @@ class Profiler: # pragma: no cover
         x = copy(x)
         self.xs.append(x)
         y = self.f(x, *args)
-        self.ys.append(y)
+        if isinstance(y, tuple): 
+            self.ys.append(y[0])
+        else:
+            self.ys.append(y)
         return y
     
     def archive(self, name):
