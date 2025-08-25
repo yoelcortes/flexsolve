@@ -90,7 +90,7 @@ def test_fixedpoint_array_solvers2():
     with pytest.raises(RuntimeError):
         solution = flx.aitken(f2, feed, convergenceiter=4, xtol=1e-8, maxiter=200)
         
-    solution = flx.wegstein(p, feed, checkconvergence=False, convergenceiter=4, xtol=1e-8)
+    solution = flx.wegstein(p, feed, checkconvergence=False, convergenceiter=4, xtol=1e-8, exp=1.0)
     p.archive('Wegstein early termination')
     assert_allclose(solution, real_solution2, rtol=1e-3)
     
@@ -114,11 +114,11 @@ def test_fixedpoint_array_solvers2():
     assert_allclose(solution, real_solution2, rtol=1e-3)
     p.archive('Fixed point early termination')
     if os.environ.get("NUMBA_DISABLE_JIT") == '1':
-        assert p.sizes() == {'Wegstein': 63, 'Wegstein early termination': 18, 
+        assert p.sizes() == {'Wegstein': 60, 'Wegstein early termination': 18, 
                              'Aitken': 6801, 'Aitken early termination': 95, 
                              'Fixed point': 191, 'Fixed point early termination': 191}
     else:
-        assert p.sizes() == {'Wegstein': 61, 'Wegstein early termination': 18, 
+        assert p.sizes() == {'Wegstein': 60, 'Wegstein early termination': 18, 
                              'Aitken': 392, 'Aitken early termination': 91,
                              'Fixed point': 191, 'Fixed point early termination': 191}
     
@@ -133,7 +133,7 @@ def test_conditional_fixedpoint_array_solvers():
     
     p = flx.Profiler(f_conditional)
     
-    solution = flx.conditional_wegstein(p, feed)
+    solution = flx.conditional_wegstein(p, feed, exp=1.0)
     assert_allclose(feed, original_feed)
     assert_allclose(solution, real_solution)
     p.archive('Wegstein')

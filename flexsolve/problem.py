@@ -4,7 +4,7 @@ Created on Thu Jun 25 22:49:17 2020
 
 @author: yrc2
 """
-from .iterative_solvers import wegstein, aitken
+from .fixed_point_solvers import wegstein, aitken
 from .profiler import Profiler
 
 __all__ = ('Problem',)

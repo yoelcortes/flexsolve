@@ -239,15 +239,15 @@ julia_problems = test_problems[-3:]
 def test_scalar_solvers():
     if os.environ.get("NUMBA_DISABLE_JIT") == '1':
         summary_values = np.array(
-            [[67, 66, 53, 44],
-             [10, 11, 24, 33],
-             [ 7,  8, 12, 17]]
+            [[67, 66, 51, 44],
+             [10, 11, 26, 33],
+             [ 7,  8, 13, 17]]
         )
     else:
         summary_values = np.array(
-            [[68, 66, 51, 42],
-             [ 9, 11, 26, 35],
-             [ 6,  8, 13, 18]]
+            [[68, 66, 49, 42],
+             [ 9, 11, 28, 35],
+             [ 6,  8, 15, 18]]
         )
     summary_array = test_problems.summary_array(solvers, tol=1e-10, solver_kwargs=kwargs)
     assert np.allclose(summary_array, summary_values)

@@ -52,65 +52,89 @@ def jit_mean(x): # pragma: no cover
 
 # Fixed point
 
-def fixedpoint_converged(dx, xtol, subset=0):
+def fixedpoint_converged(x, dx, xtol, rtol, subset=0):
     if isinstance(dx, Iterable) and dx.ndim:
-        return array_fixedpoint_converged(dx, xtol, subset)
+        return array_fixedpoint_converged(x, dx, xtol, rtol, subset)
     else:
-        return scalar_fixedpoint_converged(dx, xtol)
+        return scalar_fixedpoint_converged(x, dx, xtol, rtol)
 
 @overload(fixedpoint_converged, jit_options=dict(cache=True))
-def jit_fixedpoint_converged(dx, xtol): # pragma: no cover
+def jit_fixedpoint_converged(x, dx, xtol, rtol): # pragma: no cover
     if isinstance(dx, types.Array) and dx.ndim:
         return array_fixedpoint_converged
     else:
         return scalar_fixedpoint_converged
 
-@njit(f64(f64, f64), cache=True)
-def scalar_fixedpoint_converged(dx, xtol):
-    return dx < xtol
+@njit(cache=True)
+def scalar_fixedpoint_converged(x, dx, xtol, rtol):
+    x = np.abs(x)
+    return dx < xtol or (dx / xtol if x < xtol else dx / x) < rtol
 
 @njit(cache=True)
-def array_fixedpoint_converged(dx, xtol, subset):
-    if subset:
-        return (dx[:subset] < xtol).all()
-    else:
-        return (dx < xtol).all()
+def array_fixedpoint_converged(x, dx, xtol, rtol, subset):
+    if subset: 
+        x = x[:subset]
+        dx = dx[:subset]
+    for i in range(x.size):
+        xi = x.flat[i]
+        dxi = dx.flat[i]
+        if dxi > xtol:
+            if xi < xtol: 
+                xi = xtol
+            if dxi / xi > rtol:
+                return False
+    return True
 
 # Wegstein
 
-def wegstein_iter(x, dx, g1, g0):
+def wegstein_iter(x, dx, g1, g0, lb, ub, exp):
     if isinstance(x, Iterable):
-        return array_wegstein_iter(x, dx, g1, g0)
+        return array_wegstein_iter(x, dx, g1, g0, lb, ub, exp)
     else:
-        return scalar_wegstein_iter(x, dx, g1, g0)
+        return scalar_wegstein_iter(x, dx, g1, g0, lb, ub, exp)
 
 @overload(wegstein_iter, jit_options=dict(cache=True))
-def jit_wegstein_iter(x, dx, g1, g0):  # pragma: no cover
+def jit_wegstein_iter(x, dx, g1, g0, lb, ub, exp):  # pragma: no cover
     if isinstance(x, types.Array) and x.ndim:
         return array_wegstein_iter  
     else:
         return scalar_wegstein_iter
 
-@njit(f64(f64, f64, f64, f64), cache=True)
-def scalar_wegstein_iter(x, dx, g1, g0):
+@njit(f64(f64, f64, f64, f64, f64, f64, f64), cache=True)
+def scalar_wegstein_iter(x, dx, g1, g0, lb, ub, exp):
     denominator = dx-g1+g0
     if abs(denominator) > 1e-16 and abs(dx) < 1e16:
-        w = dx / denominator
-        x = w*g1 + (1.-w)*x
+        w = (dx / denominator)
+        if w > ub: w = ub
+        elif w < lb: w = lb
+        if not (w < 0 and exp < 1): w = w ** exp
+        return w*g1 + (1.-w)*x
     else:
-        x = g1
-    return x
+        return g1
 
 @njit(cache=True)
-def array_wegstein_iter(x, dx, g1, g0):
+def array_wegstein_iter(x, dx, g1, g0, lb, ub, exp):
     denominator = dx-g1+g0
     x_new = x.copy()
+    w = x.copy()
     for i in np.ndindex(x.shape):
         dxi = dx[i]
         di = denominator[i]
         if np.abs(di) > 1e-16 and np.abs(dxi) < 1e16: 
-            w = dxi / di
-            x_new[i] = w * g1[i] + (1. - w) * x[i]
+            w[i] = dxi / di
+        else:
+            w[i] = 1
+    w_min = w.min()
+    if w_min < lb: w += lb - w_min
+    w_max = w.max()
+    if w_max > ub: w *= ub / w_max
+    if lb < 0 and exp < 1 and w_min < 0: 
+        for i in np.ndindex(w.shape):
+            if w[i] < 0: continue
+            w[i] = w[i] ** exp
+    else:
+        w = w ** exp
+    x_new = w * g1 + (1. - w) * x
     return x_new
 
 # Aitken
